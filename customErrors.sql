@@ -2,6 +2,10 @@ EXEC sp_addmessage 50001, 16,
 	N'This category does not exists';  
 GO  
 
+EXEC sp_addmessage 50002, 16,   
+	N'This item is unavailable';  
+GO  
+
 IF OBJECT_ID ( 'uspDisplayErrors', 'P' ) IS NOT NULL   
     DROP PROCEDURE uspDisplayErrors;  
 GO  

@@ -516,3 +516,6 @@ ALTER TABLE Employees
 	ADD CONSTRAINT Employees_Employees_FK FOREIGN KEY (BossId)
 		REFERENCES Employees(PeopleId)
 GO
+
+ALTER TABLE ItemsInWarehouse ADD CHECK (Quantity >= 0)  
+GO
