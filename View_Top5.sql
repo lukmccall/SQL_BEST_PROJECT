@@ -4,3 +4,10 @@ AS
 	GROUP BY ClientsLogin
 	ORDER BY COUNT(ClientsLogin) DESC
 GO
+
+
+CREATE VIEW Top5LastComments
+AS
+	SELECT TOP 5 CommentBody FROM dbo.Comments
+	ORDER BY AddDate DESC
+GO
