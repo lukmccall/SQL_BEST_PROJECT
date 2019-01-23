@@ -21,3 +21,14 @@ AS
 	ON O.Id = OD.OrdersId
 	WHERE S.StatusInfo LIKE N'TO SEND' 
 GO
+
+!--zajebisty widoczek tylko mozna z niego zrobic funkcje ale nie wiem w sumie czy telega woli widoki czy funkcje
+DROP VIEW topBuyers
+CREATE VIEW topBuyers
+AS
+	SELECT TOP 5 O.ClientsLogin, SUM(ROUND(OD.UnitPrice * OD.Quantity * CAST((1 - OD.Discount) AS MONEY), 2)) AS TotalSpend
+	FROM Orders AS O JOIN OrdersDetails AS OD
+	ON O.Id = OD.OrdersId 
+	GROUP BY O.ClientsLogin
+	ORDER BY TotalSpend DESC 
+GO
