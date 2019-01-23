@@ -32,3 +32,17 @@ AS
 	GROUP BY O.ClientsLogin
 	ORDER BY TotalSpend DESC 
 GO
+
+!--superancko
+CREATE FUNCTION topSellers(@startDate DATETIME, @endDate DATETIME, @number INT = 5)
+RETURNS @outputTable TABLE(ProductID INT, UnitsSold INT)
+AS
+BEGIN
+	INSERT INTO @outputTable SELECT OD.ProductsId, SUM(OD.Quantity) AS UnitsSold 
+	FROM Orders AS O JOIN OrdersDetails AS OD
+	ON O.Id = OD.OrdersId WHERE O.PurchaseDate >= @startDate AND O.PurchaseDate <= @endDate
+	GROUP BY OD.ProductsId
+	ORDER BY UnitsSold DESC
+	RETURN
+END
+GO
