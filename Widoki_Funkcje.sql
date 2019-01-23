@@ -51,7 +51,8 @@ GO
 CREATE FUNCTION FullMonthsSeparation 
 (
     @DateA DATETIME,
-    @DateB DATETIME
+    @DateB DATETIME,
+	@HireDate DATETIME
 )
 RETURNS INT
 AS
@@ -60,6 +61,12 @@ BEGIN
 
     DECLARE @DateX DATETIME
     DECLARE @DateY DATETIME
+
+	IF (@HireDate >= @DateB)
+		RETURN 0
+
+	if (@HireDate > @DateA)
+		SET @DateA = @HireDate
 
     IF(@DateA < @DateB)
     BEGIN
@@ -82,5 +89,24 @@ BEGIN
                     )
 
     RETURN @Result
+END
+GO
+
+!--Boze jaka super funkcja jakbym mial kiedys baze danych chcialbym zeby taka w niej byla
+CREATE FUNCTION salaries(@startDate DATETIME, @endDate DATETIME)
+RETURNS @outputTable TABLE(Name NVARCHAR(30), Surname NVARCHAR(30), Earnings INT)
+AS
+BEGIN
+	INSERT INTO @outputTable 
+	SELECT P.Name, P.Surname, 
+	dbo.FullMonthsSeparation(@startDate, @endDate, E.HireDate) * PO.salary + ISNULL(
+		(SELECT SUM(BB.BonusSalary) FROM BonusSalary AS BB 
+		WHERE BB.EmployeesId = E.PeopleId AND BB.ReceivedDate >= @startDate AND BB.ReceivedDate <= @endDate
+		GROUP BY BB.EmployeesId
+		),0)
+	FROM People AS P JOIN Employees AS E 
+	ON P.Id = E.PeopleId JOIN Positions AS PO
+	ON E.PositionsId = PO.Id
+	RETURN
 END
 GO
