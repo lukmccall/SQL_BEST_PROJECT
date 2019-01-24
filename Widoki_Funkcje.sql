@@ -124,3 +124,11 @@ BEGIN
 	END
 	RETURN @output
 END
+
+--Sel-explanatory
+CREATE VIEW SortByRating
+AS
+	SELECT TOP 100 PERCENT R.ProductsId, AVG(R.Rating) AS [Average Rating] FROM Ratings AS R 
+	GROUP BY R.ProductsId
+	ORDER BY [Average Rating]
+GO
