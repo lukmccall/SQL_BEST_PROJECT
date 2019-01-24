@@ -174,3 +174,21 @@ AS
 	FROM ItemsInWarehouse AS IW JOIN Warehouse AS W ON IW.WarehouseId = W.Id
 	GROUP BY IW.ItemsId
 GO
+
+--Returns all employees that work at given position
+CREATE FUNCTION GetEmployees(@positionID INT)
+RETURNS @output TABLE(PositionID INT, 
+						PositionName NVARCHAR(30), 
+						EmployeeID INT, 
+						Name NVARCHAR(30), 
+						Surname NVARCHAR(30))
+AS
+BEGIN
+	INSERT INTO @output SELECT 
+		@positionID AS [PositionID], (SELECT P.Position FROM POSITIONS AS P WHERE P.Id = @positionID), P.Id AS [EmployeeID], P.Name, P.Surname
+		FROM Employees AS E JOIN People AS P ON E.PeopleId = P.Id
+		WHERE E.PositionsId = @positionID
+	RETURN
+END
+GO
+		    
