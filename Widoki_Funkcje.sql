@@ -5,7 +5,6 @@ AS
 	ORDER BY COUNT(ClientsLogin) DESC
 GO
 
-
 CREATE VIEW Top5LastComments
 AS
 	SELECT TOP 5 CommentBody FROM dbo.Comments
@@ -13,7 +12,7 @@ AS
 GO
 
 --bardzo ładny tutaj view jak mnie uczyli na zajeciach mi sie podoba nie zadna funkcja
-CREATE VIEW itemsToSend
+CREATE VIEW ItemsToSend
 AS
 	SELECT O.Id, O.Country, O.City, O.Address, OD.ProductsId, OD.Quantity FROM Status AS S JOIN OrdersStatus AS OS
 	ON S.Id = OS.StatusId  JOIN Orders AS O
@@ -23,8 +22,7 @@ AS
 GO
 
 --zajebisty widoczek tylko mozna z niego zrobic funkcje ale nie wiem w sumie czy telega woli widoki czy funkcje
-DROP VIEW topBuyers
-CREATE VIEW topBuyers
+CREATE VIEW TopBuyers
 AS
 	SELECT TOP 5 O.ClientsLogin, SUM(ROUND(OD.UnitPrice * OD.Quantity * CAST((1 - OD.Discount) AS MONEY), 2)) AS TotalSpend
 	FROM Orders AS O JOIN OrdersDetails AS OD
@@ -34,7 +32,8 @@ AS
 GO
 
 --superancko
-CREATE FUNCTION topSellers(@startDate DATETIME, @endDate DATETIME, @number INT = 5)
+--Returns top selling items at a given time
+CREATE FUNCTION TopSellers(@startDate DATETIME, @endDate DATETIME, @number INT = 5)
 RETURNS @outputTable TABLE(ProductID INT, UnitsSold INT)
 AS
 BEGIN
@@ -48,6 +47,7 @@ END
 GO
 
 --funkcyja liczy ile miesiecy minelo bo potrzebuje do nastepnej funkcji (super zastosowanie tomek polecam)
+--Return how many full months there are between two dates
 CREATE FUNCTION FullMonthsSeparation 
 (
     @DateA DATETIME,
@@ -93,7 +93,9 @@ END
 GO
 
 --Boze jaka super funkcja jakbym mial kiedys baze danych chcialbym zeby taka w niej byla
-CREATE FUNCTION salaries(@startDate DATETIME, @endDate DATETIME)
+--Returns how much each employee has earned in a given time 
+--	(we assume that the salary was paid to employee after 1 month of work and not on like 10th of each month)
+CREATE FUNCTION Salaries(@startDate DATETIME, @endDate DATETIME)
 RETURNS @outputTable TABLE(Name NVARCHAR(30), Surname NVARCHAR(30), Earnings INT)
 AS
 BEGIN
@@ -125,10 +127,22 @@ BEGIN
 	RETURN @output
 END
 
---Sel-explanatory
+--Sel-explanatory returns best rated products
 CREATE VIEW SortByRating
 AS
 	SELECT TOP 100 PERCENT R.ProductsId, AVG(R.Rating) AS [Average Rating] FROM Ratings AS R 
 	GROUP BY R.ProductsId
 	ORDER BY [Average Rating]
+GO
+
+--Returns status of an order with name of ordered product and payment date to verify that the order has been paid for
+CREATE FUNCTION CheckStatus(@id INT)
+RETURNS @output TABLE(OrderID INT, Status TEXT, Name TEXT, PaymentDate DATETIME) 
+AS
+BEGIN
+	INSERT INTO @output SELECT @id, (SELECT S.StatusInfo FROM STATUS AS S WHERE S.Id = OS.StatusID),
+		dbo.GetName(@id), (SELECT P.PaymentDate FROM Payments AS P WHERE P.Id = OS.OrdersId)  
+	FROM OrdersStatus AS OS
+	RETURN
+END
 GO
