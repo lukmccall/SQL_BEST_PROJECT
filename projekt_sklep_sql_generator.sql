@@ -291,7 +291,8 @@ CREATE TABLE PromotionCodes (
     Used			bit DEFAULT 0 ,
     Code			nvarchar (10) NOT NULL, 
     ExpirDate		DATETIME NOT NULL , 
-    ClientsLogin	NVARCHAR (30) 
+    ClientsLogin	NVARCHAR (30),
+	OrdersId			INT,
 ) 
 Go
 
@@ -481,6 +482,11 @@ ALTER TABLE PromotionCodes
         REFERENCES Products ( Id )
 GO
 
+ALTER TABLE PromotionCodes
+	ADD CONSTRAINT PromotionCodes_Orders_FK FOREIGN KEY (OrdersId)
+		REFERENCES Orders ( Id )
+GO
+
 ALTER TABLE Ratings
     ADD CONSTRAINT Ratings_Clients_FK FOREIGN KEY ( ClientsLogin )
         REFERENCES Clients ( Login )
@@ -516,6 +522,8 @@ ALTER TABLE Employees
 	ADD CONSTRAINT Employees_Employees_FK FOREIGN KEY (BossId)
 		REFERENCES Employees(PeopleId)
 GO
+
+
 
 ALTER TABLE ItemsInWarehouse ADD CHECK (Quantity >= 0)  
 GO
