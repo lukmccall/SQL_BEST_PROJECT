@@ -156,3 +156,13 @@ AS
 	JOIN Clients AS C ON A.ClientsLogin = C.Login
 	JOIN People AS P ON P.Id = C.PeopleId
 GO
+
+--Returns wheter code is still active right now
+CREATE FUNCTION IsCodeActive(@id INT) RETURNS BIT
+AS
+BEGIN
+	IF (EXISTS (SELECT 1 FROM PromotionCodes AS PC WHERE PC.Id = @id AND PC.ExpirDate > GETDATE()))
+		RETURN 1
+	RETURN 0
+END
+GO
