@@ -191,4 +191,18 @@ BEGIN
 	RETURN
 END
 GO
-		    
+	
+--Returns active clients in given time period and the number of purchases of every client
+CREATE FUNCTION GetActiveClients(@start DATETIME, @end DATETIME)
+RETURNS @output TABLE(ClientID INT,
+						ClientName NVARCHAR(30),
+						ClientSurname NVARCHAR(30),
+						NumberOfOrders INT)
+AS
+BEGIN
+	INSERT INTO @output SELECT DISTINCT C.PeopleId, P.Name, P.Surname, 
+	(SELECT COUNT(O.Id) FROM Orders AS O WHERE C.Login = O.ClientsLogin AND O.PurchaseDate >= @start AND O.PurchaseDate <= @end GROUP BY O.ClientsLogin) AS [NumberOfOrders]
+	FROM Clients AS C JOIN People AS P ON C.PeopleId = P.Id
+	WHERE ((SELECT COUNT(O.Id) FROM Orders AS O WHERE C.Login = O.ClientsLogin AND O.PurchaseDate >= @start AND O.PurchaseDate <= @end GROUP BY O.ClientsLogin) > 0)
+	RETURN
+END 
