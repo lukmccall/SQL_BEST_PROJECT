@@ -11,8 +11,9 @@ BEGIN
 			JOIN Warehouse AS W ON W.Id =  IW.WarehouseId
 			WHERE IW.ItemsId = @id AND w.Country LIKE @country)
 END
+GO
 
-
+/* TEGO NIE MA BO DANIEL ZROBIL LEPSZE
 IF OBJECT_ID('dbo.uspSellItem', 'P') IS NOT NULL
     DROP PROCEDURE dbo.uspSellItem
 GO
@@ -42,3 +43,4 @@ AS
 
 EXEC dbo.uspSellItem 11, 2, 100
 SELECT * FROM ItemsInWarehouse
+*/

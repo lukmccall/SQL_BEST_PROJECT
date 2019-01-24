@@ -1,3 +1,7 @@
+------------------------------------------------------- TWORZENIE TABEL
+IF OBJECT_ID('dbo.ActiveServices', 'U') IS NOT NULL 
+	DROP TABLE ActiveServices
+GO
 CREATE TABLE ActiveServices (
     ServicesId     INT NOT NULL,
     ClientsLogin   nvarchar (30) NOT NULL, 
@@ -12,6 +16,10 @@ ALTER TABLE ActiveServices ADD constraint ActiveServices_PK PRIMARY KEY CLUSTERE
      ALLOW_ROW_LOCKS = ON ) 
 GO
 
+
+IF OBJECT_ID('dbo.BonusSalary', 'U') IS NOT NULL 
+	DROP TABLE BonusSalary
+GO
 CREATE TABLE BonusSalary ( 
 	EmployeesId INT NOT NULL, 
 	ReceivedDate DATE NOT NULL,
@@ -25,6 +33,9 @@ ALTER TABLE BonusSalary ADD constraint BonusSalary_PK PRIMARY KEY CLUSTERED (Emp
      ALLOW_ROW_LOCKS = ON ) 
 GO
 
+IF OBJECT_ID('dbo.Categories', 'U') IS NOT NULL 
+	DROP TABLE Categories
+GO
 CREATE TABLE Categories (
     Id     INT IDENTITY(1,1),
     Category   nvarchar(30) 
@@ -37,6 +48,9 @@ ALTER TABLE Categories ADD constraint Categories_PK PRIMARY KEY CLUSTERED (Id)
      ALLOW_ROW_LOCKS = ON ) 
 GO
 
+IF OBJECT_ID('dbo.Clients', 'U') IS NOT NULL 
+	DROP TABLE Clients
+GO
 CREATE TABLE Clients ( 
 	Login nvarchar (30) NOT NULL , 
 	PeopleId INT NOT NULL,
@@ -50,6 +64,9 @@ ALTER TABLE Clients ADD constraint Clients_PK PRIMARY KEY CLUSTERED (Login)
      ALLOW_ROW_LOCKS = ON ) 
 GO
 
+IF OBJECT_ID('dbo.Comments', 'U') IS NOT NULL 
+	DROP TABLE Comments
+GO
 CREATE TABLE Comments ( 
 	NewsId INT NOT NULL , 
     ClientsLogin NVARCHAR(30) NOT NULL,
@@ -64,6 +81,9 @@ ALTER TABLE Comments ADD constraint Comments_PK PRIMARY KEY CLUSTERED (AddDate, 
      ALLOW_ROW_LOCKS = ON ) 
 GO
 
+IF OBJECT_ID('dbo.Employees', 'U') IS NOT NULL 
+	DROP TABLE Employees
+GO
 CREATE TABLE Employees (
     PeopleId      INT NOT NULL,
     HireDate       DATE NOT NULL,
@@ -78,6 +98,9 @@ ALTER TABLE Employees ADD constraint Employees_PK PRIMARY KEY CLUSTERED (PeopleI
      ALLOW_ROW_LOCKS = ON ) 
 GO
 
+IF OBJECT_ID('dbo.ExpiredServices', 'U') IS NOT NULL 
+	DROP TABLE ExpiredServices
+GO
 CREATE TABLE ExpiredServices (
 	ServicesId     INT NOT NULL,
     ClientsLogin   nvarchar (30) NOT NULL,
@@ -91,6 +114,9 @@ ALTER TABLE ExpiredServices ADD constraint ExpiredServices_PK PRIMARY KEY CLUSTE
      ALLOW_ROW_LOCKS = ON ) 
 GO
 
+IF OBJECT_ID('dbo.Items', 'U') IS NOT NULL 
+	DROP TABLE Items
+GO
 CREATE TABLE Items (
     Id		     INT NOT NULL,
     Name         nvarchar (30) , 
@@ -103,6 +129,9 @@ ALTER TABLE Items ADD constraint Items_PK PRIMARY KEY CLUSTERED (Id)
      ALLOW_ROW_LOCKS = ON ) 
 GO
 
+IF OBJECT_ID('dbo.ItemsInWarehouse', 'U') IS NOT NULL 
+	DROP TABLE ItemsInWarehouse
+GO
 CREATE TABLE ItemsInWarehouse (
     ItemsId       INT NOT NULL,
 	WarehouseId   INT NOT NULL,
@@ -116,6 +145,9 @@ ALTER TABLE ItemsInWarehouse ADD constraint ItemsInWarehouse_PK PRIMARY KEY CLUS
      ALLOW_ROW_LOCKS = ON ) 
 GO
 
+IF OBJECT_ID('dbo.Logs', 'U') IS NOT NULL 
+	DROP TABLE Logs
+GO
 CREATE TABLE Logs( 
 	 Id INT IDENTITY(1,1),
 	 Date DATETIME , 
@@ -130,6 +162,9 @@ ALTER TABLE Logs ADD constraint Logs_PK PRIMARY KEY CLUSTERED (Id)
      ALLOW_ROW_LOCKS = ON ) 
 GO
 
+IF OBJECT_ID('dbo.News', 'U') IS NOT NULL 
+	DROP TABLE News
+GO
 CREATE TABLE News ( 
 	Id INT IDENTITY(1,1), 
     Topic nvarchar(30) NOT NULL,
@@ -138,13 +173,15 @@ CREATE TABLE News (
 )
 GO
 
-
 ALTER TABLE News ADD constraint News_PK PRIMARY KEY CLUSTERED (Id)
      WITH (
      ALLOW_PAGE_LOCKS = ON , 
      ALLOW_ROW_LOCKS = ON ) 
 GO
 
+IF OBJECT_ID('dbo.Orders', 'U') IS NOT NULL 
+	DROP TABLE Orders
+GO
 CREATE TABLE Orders (
     Id             INT IDENTITY(1,1),
     PurchaseDate   datetime,
@@ -161,6 +198,10 @@ ALTER TABLE Orders ADD constraint Orders_PK PRIMARY KEY CLUSTERED (Id)
      ALLOW_ROW_LOCKS = ON ) 
 GO
 
+
+IF OBJECT_ID('dbo.OrdersDetails', 'U') IS NOT NULL 
+	DROP TABLE OrdersDetails
+GO
 CREATE TABLE OrdersDetails (
     OrdersId     INT NOT NULL,
     ProductsId   INT NOT NULL,
@@ -176,6 +217,9 @@ ALTER TABLE OrdersDetails ADD constraint OrdersDetails_PK PRIMARY KEY CLUSTERED 
      ALLOW_ROW_LOCKS = ON ) 
 GO
 
+IF OBJECT_ID('dbo.Status', 'U') IS NOT NULL 
+	DROP TABLE Status
+GO
 CREATE TABLE Status(
 	Id INT IDENTITY(1,1),
 	StatusInfo text,
@@ -188,6 +232,9 @@ ALTER TABLE Status ADD constraint Status_PK PRIMARY KEY CLUSTERED (Id)
      ALLOW_ROW_LOCKS = ON ) 
 GO
 
+IF OBJECT_ID('dbo.OrdersStatus', 'U') IS NOT NULL 
+	DROP TABLE OrdersStatus
+GO
 CREATE TABLE OrdersStatus (
     OrdersId    INT NOT NULL,
     StatusId    INT NOT NULL,
@@ -200,6 +247,9 @@ ALTER TABLE OrdersStatus ADD constraint OrdersStatus_PK PRIMARY KEY CLUSTERED (O
      ALLOW_ROW_LOCKS = ON ) 
 GO
 
+IF OBJECT_ID('dbo.Payments', 'U') IS NOT NULL 
+	DROP TABLE Payments
+GO
 CREATE TABLE Payments ( 
 	Id				INT IDENTITY(1,1), 
 	PaymentsTypsId	INT NOT NULL , 
@@ -215,6 +265,9 @@ ALTER TABLE Payments ADD constraint Payments_PK PRIMARY KEY CLUSTERED (Id)
      ALLOW_ROW_LOCKS = ON ) 
 GO
 
+IF OBJECT_ID('dbo.PaymentsTyps', 'U') IS NOT NULL 
+	DROP TABLE PaymentsTyps
+GO
 CREATE TABLE PaymentsTyps (
     Id     INT IDENTITY(1,1),
     Type   nvarchar(30) NOT NULL, 
@@ -229,6 +282,9 @@ ALTER TABLE PaymentsTyps ADD constraint PaymentsTyps_PK PRIMARY KEY CLUSTERED (I
      ALLOW_ROW_LOCKS = ON )
 Go
 
+IF OBJECT_ID('dbo.People', 'U') IS NOT NULL 
+	DROP TABLE People
+GO
 CREATE TABLE People (
     Id     INT IDENTITY(1,1),
     Name   nvarchar (30) NOT NULL, 
@@ -247,6 +303,9 @@ ALTER TABLE People ADD constraint People_pk PRIMARY KEY CLUSTERED (Id)
      ALLOW_ROW_LOCKS = ON ) 
 Go
 
+IF OBJECT_ID('dbo.Positions', 'U') IS NOT NULL 
+	DROP TABLE Positions
+GO
 CREATE TABLE Positions (
     Id         INT IDENTITY(1,1),
     Position   nvarchar(30) NOT NULL, 
@@ -259,6 +318,9 @@ ALTER TABLE Positions ADD constraint Positions_PK PRIMARY KEY CLUSTERED (Id)
      ALLOW_ROW_LOCKS = ON ) 
 Go
 
+IF OBJECT_ID('dbo.Products', 'U') IS NOT NULL 
+	DROP TABLE Products
+GO
 CREATE TABLE Products (
     Id            INT NOT NULL,
     Description   text NOT NULL
@@ -271,6 +333,9 @@ ALTER TABLE Products ADD constraint Products_PK PRIMARY KEY CLUSTERED (Id)
      ALLOW_ROW_LOCKS = ON ) 
 GO
 
+IF OBJECT_ID('dbo.ProductsPrices', 'U') IS NOT NULL 
+	DROP TABLE ProductsPrices
+GO
 CREATE TABLE ProductsPrices (
     ProductsId   INT NOT NULL,
     StartDate     datetime NOT NULL,
@@ -285,14 +350,18 @@ ALTER TABLE ProductsPrices ADD constraint ProductsPrices_pk PRIMARY KEY CLUSTERE
      ALLOW_ROW_LOCKS = ON ) 
 GO
 
+IF OBJECT_ID('dbo.PromotionCodes', 'U') IS NOT NULL 
+	DROP TABLE PromotionCodes
+GO
 CREATE TABLE PromotionCodes (
     Id				INT IDENTITY(1,1),
 	ProductsId		INT NOT NULL,
+	Discount		INT,
     Used			bit DEFAULT 0 ,
     Code			nvarchar (10) NOT NULL, 
     ExpirDate		DATETIME NOT NULL , 
     ClientsLogin	NVARCHAR (30),
-	OrdersId			INT,
+	OrdersId		INT
 ) 
 Go
 
@@ -302,6 +371,9 @@ ALTER TABLE PromotionCodes ADD constraint PromotionCodes_pk PRIMARY KEY CLUSTERE
      ALLOW_ROW_LOCKS = ON ) 
 GO
 
+IF OBJECT_ID('dbo.Ratings', 'U') IS NOT NULL 
+	DROP TABLE Ratings
+GO
 CREATE TABLE Ratings( 
 	ClientsLogin nvarchar (30) NOT NULL ,
 	ProductsId INT NOT NULL, 
@@ -316,6 +388,9 @@ ALTER TABLE Ratings ADD constraint Ratings_pk PRIMARY KEY CLUSTERED (ClientsLogi
      ALLOW_ROW_LOCKS = ON ) 
 GO
 
+IF OBJECT_ID('dbo.Sales', 'U') IS NOT NULL 
+	DROP TABLE Sales
+GO
 CREATE TABLE Sales (
     ProductsId   INT NOT NULL,
     Unitprice     money NOT NULL,
@@ -329,6 +404,9 @@ ALTER TABLE Sales ADD constraint Sales_PK PRIMARY KEY CLUSTERED (ProductsId)
      ALLOW_ROW_LOCKS = ON ) 
 GO
 
+IF OBJECT_ID('dbo.Services', 'U') IS NOT NULL 
+	DROP TABLE Services
+GO
 CREATE TABLE Services (
     Id			 INT NOT NULL,
     Name		 nvarchar (30) NOT NULL, 
@@ -342,6 +420,9 @@ ALTER TABLE Services ADD constraint Services_PK PRIMARY KEY CLUSTERED (Id)
      ALLOW_ROW_LOCKS = ON ) 
 GO
 
+IF OBJECT_ID('dbo.Warehouse', 'U') IS NOT NULL 
+	DROP TABLE Warehouse
+GO
 CREATE TABLE Warehouse (
     Id     INT IDENTITY(1,1),
     Name   nvarchar (30) NOT NULL, 
@@ -357,7 +438,9 @@ ALTER TABLE Warehouse ADD constraint Warehouse_PK PRIMARY KEY CLUSTERED (Id)
      ALLOW_PAGE_LOCKS = ON , 
      ALLOW_ROW_LOCKS = ON ) 
 GO
+------------------------------------------------------- KONIEC TWORZENIE TABEL
 
+------------------------------------------------------- KLUCZE OBCE
 ALTER TABLE ActiveServices
     ADD CONSTRAINT ActiveServices_Clients_FK FOREIGN KEY ( ClientsLogin )
         REFERENCES clients ( Login )
@@ -523,7 +606,471 @@ ALTER TABLE Employees
 		REFERENCES Employees(PeopleId)
 GO
 
+------------------------------------------------------- KONIEC KLUCZY OBCYCH
 
 
+------------------------------------------------------- DODATKOWE CONSTRAINY 
 ALTER TABLE ItemsInWarehouse ADD CHECK (Quantity >= 0)  
 GO
+------------------------------------------------------- KONIEC DODATKOWYCH CONSTRAINÓW 
+
+------------------------------------------------------- SEKWENCJE
+CREATE SEQUENCE ProductsSequence 
+    START WITH 1  
+    INCREMENT BY 1
+GO
+------------------------------------------------------- KONIEC SEKWENCJI
+------------------------------------------------------- INFORMACJE O B£ÊDACH
+EXEC sp_addmessage 50001, 16,   
+	N'This category does not exists';  
+GO  
+
+EXEC sp_addmessage 50002, 16,   
+	N'This item is unavailable';  
+GO  
+
+IF OBJECT_ID ( 'dbo.uspDisplayErrors', 'P' ) IS NOT NULL   
+    DROP PROCEDURE dbo.uspDisplayErrors;  
+GO  
+-- Procedura wywo³uj¹ca b³êd z poziomu bloku catch 
+CREATE PROCEDURE uspDisplayErrors 
+AS 
+	DECLARE @ErrorMessage NVARCHAR(4000);  
+    DECLARE @ErrorSeverity INT;  
+    DECLARE @ErrorState INT;  
+  
+    SELECT   
+        @ErrorMessage = ERROR_MESSAGE(),  
+        @ErrorSeverity = ERROR_SEVERITY(),  
+        @ErrorState = ERROR_STATE()
+
+    RAISERROR (@ErrorMessage, -- Message text.  
+               @ErrorSeverity, -- Severity.  
+               @ErrorState -- State. 
+				);  
+GO
+
+------------------------------------------------------- KONIEC INFORMACJI O B£ÊDACH
+
+------------------------------------------------------- FUNKCJE
+IF OBJECT_ID ( 'dbo.ufnTopSellers', 'F' ) IS NOT NULL   
+    DROP PROCEDURE dbo.uspDisplayErrors;  
+GO 
+-- Najlepiej sprzedaj¹ce siê produkty w podanym przedziale
+CREATE FUNCTION ufnTopSellers(@startDate DATETIME, @endDate DATETIME)
+RETURNS @outputTable TABLE(ProductID INT, UnitsSold INT)
+AS
+BEGIN
+	INSERT INTO @outputTable SELECT OD.ProductsId, SUM(OD.Quantity) AS UnitsSold 
+	FROM Orders AS O JOIN OrdersDetails AS OD
+	ON O.Id = OD.OrdersId WHERE O.PurchaseDate >= @startDate AND O.PurchaseDate <= @endDate
+	GROUP BY OD.ProductsId
+	ORDER BY UnitsSold DESC
+	RETURN
+END
+GO
+
+IF OBJECT_ID ( 'dbo.ufnFullMonthsSeparation', 'F' ) IS NOT NULL   
+    DROP PROCEDURE dbo.ufnFullMonthsSeparation;  
+GO 
+--Funkcja licz¹ca ile miesiecy minelo
+CREATE FUNCTION ufnFullMonthsSeparation 
+(
+    @DateA DATETIME,
+    @DateB DATETIME,
+	@HireDate DATETIME
+)
+RETURNS INT
+AS
+BEGIN
+    DECLARE @Result INT
+
+    DECLARE @DateX DATETIME
+    DECLARE @DateY DATETIME
+
+	IF (@HireDate >= @DateB)
+		RETURN 0
+
+	if (@HireDate > @DateA)
+		SET @DateA = @HireDate
+
+    IF(@DateA < @DateB)
+    BEGIN
+        SET @DateX = @DateA
+        SET @DateY = @DateB
+    END
+    ELSE
+    BEGIN
+        SET @DateX = @DateB
+        SET @DateY = @DateA
+    END
+
+    SET @Result = (
+                    SELECT 
+                    CASE 
+                        WHEN DATEPART(DAY, @DateX) > DATEPART(DAY, @DateY)
+                        THEN DATEDIFF(MONTH, @DateX, @DateY) - 1
+                        ELSE DATEDIFF(MONTH, @DateX, @DateY)
+                    END
+                    )
+
+    RETURN @Result
+END
+GO
+
+IF OBJECT_ID ( 'dbo.ufnSalaries', 'F' ) IS NOT NULL   
+    DROP PROCEDURE dbo.ufnSalaries;  
+GO 
+--Funkcja zwracaj¹ca ile zarobili procownicy w danym okresie czasu
+CREATE FUNCTION ufnSalaries(@startDate DATETIME, @endDate DATETIME)
+RETURNS @outputTable TABLE(Name NVARCHAR(30), Surname NVARCHAR(30), Earnings INT)
+AS
+BEGIN
+	INSERT INTO @outputTable 
+	SELECT P.Name, P.Surname, 
+	dbo.ufnFullMonthsSeparation(@startDate, @endDate, E.HireDate) * PO.salary + ISNULL(
+		(SELECT SUM(BB.BonusSalary) FROM BonusSalary AS BB 
+		WHERE BB.EmployeesId = E.PeopleId AND BB.ReceivedDate >= @startDate AND BB.ReceivedDate <= @endDate
+		GROUP BY BB.EmployeesId
+		),0)
+	FROM People AS P JOIN Employees AS E 
+	ON P.Id = E.PeopleId JOIN Positions AS PO
+	ON E.PositionsId = PO.Id
+	RETURN
+END
+GO
+
+IF OBJECT_ID ( 'dbo.ufnGetProductName', 'F' ) IS NOT NULL   
+    DROP PROCEDURE dbo.ufnGetProductName;  
+GO 
+--Zwraca nazwê produktu po zadanym id
+CREATE FUNCTION ufnGetProductName(@id INT)
+RETURNS VARCHAR(100)
+AS
+BEGIN
+	DECLARE @output VARCHAR(100)
+	SET @output = (SELECT I.Name FROM Items AS I WHERE I.id = @id)
+	IF (@output IS NULL)
+	BEGIN
+		SET @output = (SELECT S.Name FROM Services AS S WHERE S.id = @id)
+	END
+	RETURN @output
+END
+GO
+
+IF OBJECT_ID ( 'dbo.ufnCheckStatus', 'F' ) IS NOT NULL   
+    DROP PROCEDURE dbo.ufnCheckStatus;  
+GO 
+--Zwraca statusy zamówieñ z datami p³atnoœci
+CREATE FUNCTION ufnCheckStatus(@id INT)
+RETURNS @output TABLE(OrderID INT, Status TEXT, Name TEXT, PaymentDate DATETIME) 
+AS
+BEGIN
+	INSERT INTO @output SELECT @id, (SELECT S.StatusInfo FROM STATUS AS S WHERE S.Id = OS.StatusID),
+		dbo.ufnGetProductName(@id), (SELECT P.PaymentDate FROM Payments AS P WHERE P.Id = OS.OrdersId)  
+	FROM OrdersStatus AS OS
+	RETURN
+END
+GO
+
+IF OBJECT_ID ( 'dbo.ufnIsCodeActive', 'F' ) IS NOT NULL   
+    DROP PROCEDURE dbo.ufnIsCodeActive;  
+GO 
+--Sprawdza czy dany kod zosta³ ju¿ u¿yty, czy nie
+CREATE FUNCTION ufnIsCodeActive(@id INT) RETURNS BIT
+AS
+BEGIN
+	IF (EXISTS (SELECT 1 FROM PromotionCodes AS PC WHERE PC.Id = @id AND PC.ExpirDate > GETDATE()))
+		RETURN 1
+	RETURN 0
+END
+GO
+
+IF OBJECT_ID ( 'dbo.ufnGetEmployees', 'F' ) IS NOT NULL   
+    DROP PROCEDURE dbo.ufnGetEmployees;  
+GO 
+--Zwraca wszystkich pracowników na danej pozycji
+CREATE FUNCTION ufnGetEmployees(@positionID INT)
+RETURNS @output TABLE(PositionID INT, 
+						PositionName NVARCHAR(30), 
+						EmployeeID INT, 
+						Name NVARCHAR(30), 
+						Surname NVARCHAR(30))
+AS
+BEGIN
+	INSERT INTO @output SELECT 
+		@positionID AS [PositionID], (SELECT P.Position FROM POSITIONS AS P WHERE P.Id = @positionID), P.Id AS [EmployeeID], P.Name, P.Surname
+		FROM Employees AS E JOIN People AS P ON E.PeopleId = P.Id
+		WHERE E.PositionsId = @positionID
+	RETURN
+END
+GO
+
+---------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
+---------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
+---------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
+---------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
+---------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
+---------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
+---------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
+---------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
+-- A to nie wiem co ma robiæ xDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
+/*
+--Returns active clients in given time period and the number of purchases of every client
+CREATE FUNCTION GetActiveClients(@start DATETIME, @end DATETIME)
+RETURNS @output TABLE(ClientID INT,
+						ClientName NVARCHAR(30),
+						ClientSurname NVARCHAR(30),
+						NumberOfOrders INT)
+AS
+BEGIN
+	INSERT INTO @output SELECT DISTINCT C.PeopleId, P.Name, P.Surname, 
+	(SELECT COUNT(O.Id) FROM Orders AS O WHERE C.Login = O.ClientsLogin AND O.PurchaseDate >= @start AND O.PurchaseDate <= @end GROUP BY O.ClientsLogin) AS [NumberOfOrders]
+	FROM Clients AS C JOIN People AS P ON C.PeopleId = P.Id
+	WHERE ((SELECT COUNT(O.Id) FROM Orders AS O WHERE C.Login = O.ClientsLogin AND O.PurchaseDate >= @start AND O.PurchaseDate <= @end GROUP BY O.ClientsLogin) > 0)
+	RETURN
+END
+*/ 
+
+IF OBJECT_ID('dbo.ufnCountItemsInWarehouse', 'FN') IS NOT NULL
+    DROP FUNCTION dbo.ufnCountItemsInWarehouse
+GO
+-- Zwaraca iloœæ danego przedmiotu w magazynach (z danego kraju)
+CREATE FUNCTION dbo.ufnCountItemsInWarehouse (@id INT, @country	NVARCHAR(30) = NULL)
+RETURNS INT
+AS
+BEGIN
+	IF @country IS NULL 
+		RETURN (SELECT SUM(Quantity) AS ItemCount FROM dbo.ItemsInWarehouse WHERE ItemsId = @id)
+	RETURN (SELECT SUM(IW.Quantity) AS ItemCount FROM dbo.ItemsInWarehouse AS IW 
+			JOIN Warehouse AS W ON W.Id =  IW.WarehouseId
+			WHERE IW.ItemsId = @id AND w.Country LIKE @country)
+END
+GO
+
+------------------------------------------------------- KONIEC FUNKCJI
+
+------------------------------------------------------- WIDOKI 
+
+IF OBJECT_ID ( 'Top5Commentators', 'v' ) IS NOT NULL   
+    DROP VIEW Top5Commentators;  
+GO
+-- Najlepsi komentuj¹ce
+CREATE VIEW Top5Commentators
+AS
+	SELECT TOP 5 ClientsLogin, COUNT(ClientsLogin) "Count" FROM dbo.Comments
+	GROUP BY ClientsLogin
+	ORDER BY COUNT(ClientsLogin) DESC
+GO
+
+IF OBJECT_ID ( 'Top5LastComments', 'v' ) IS NOT NULL   
+    DROP VIEW Top5LastComments;  
+GO
+-- Ostatnie kometarze
+CREATE VIEW Top5LastComments
+AS
+	SELECT TOP 5 CommentBody FROM dbo.Comments
+	ORDER BY AddDate DESC
+GO
+
+IF OBJECT_ID ( 'ItemsToSend', 'v' ) IS NOT NULL   
+    DROP VIEW ItemsToSend;  
+GO
+-- Przedmioty, które nale¿y wys³aæ
+CREATE VIEW ItemsToSend
+AS
+	SELECT O.Id, O.Country, O.City, O.Address, OD.ProductsId, OD.Quantity FROM Status AS S JOIN OrdersStatus AS OS
+	ON S.Id = OS.StatusId  JOIN Orders AS O
+	ON OS.OrdersId = O.Id JOIN OrdersDetails AS OD
+	ON O.Id = OD.OrdersId
+	WHERE S.StatusInfo LIKE N'TO SEND' 
+GO
+
+IF OBJECT_ID ( 'TopBuyers', 'v' ) IS NOT NULL   
+    DROP VIEW TopBuyers;  
+GO
+-- Najlepsi kupuj¹cy
+CREATE VIEW TopBuyers
+AS
+	SELECT TOP 5 O.ClientsLogin, SUM(ROUND(OD.UnitPrice * OD.Quantity * CAST((1 - OD.Discount) AS MONEY), 2)) AS TotalSpend
+	FROM Orders AS O JOIN OrdersDetails AS OD
+	ON O.Id = OD.OrdersId 
+	GROUP BY O.ClientsLogin
+	ORDER BY TotalSpend DESC 
+GO
+
+IF OBJECT_ID ( 'SortByRating', 'v' ) IS NOT NULL   
+    DROP VIEW SortByRating;  
+GO
+-- Produkty posortowane po ocenach
+CREATE VIEW SortByRating
+AS
+	SELECT TOP 100 PERCENT R.ProductsId, AVG(R.Rating) AS [Average Rating] FROM Ratings AS R 
+	GROUP BY R.ProductsId
+	ORDER BY [Average Rating]
+GO
+
+---------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
+---------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
+---------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
+---------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
+---------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
+---------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
+---------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
+---------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
+-- A to nie wiem co ma robiæ xDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
+/*
+CREATE VIEW ActiveClients
+AS
+	SELECT P.Id AS [ClientID], A.ServicesId AS [ServiceID], P.Name, P.Surname, A.StartDate, A.EndDate 
+	FROM ActiveServices AS A 
+	JOIN Clients AS C ON A.ClientsLogin = C.Login
+	JOIN People AS P ON P.Id = C.PeopleId
+GO
+*/
+
+IF OBJECT_ID ( 'SumItems', 'v' ) IS NOT NULL   
+    DROP VIEW SumItems;  
+GO
+--Sumy wszystkich przedmiotów w magazynach
+CREATE VIEW SumItems
+AS
+	SELECT IW.ItemsId AS [ID], (SELECT DISTINCT I.Name FROM Items AS I WHERE I.Id = IW.ItemsId) AS [Name], SUM(IW.Quantity) AS [Sum] 
+	FROM ItemsInWarehouse AS IW JOIN Warehouse AS W ON IW.WarehouseId = W.Id
+	GROUP BY IW.ItemsId
+GO
+------------------------------------------------------- KONIEC WIDOKÓW
+
+
+------------------------------------------------------- PROCEDURY
+
+IF OBJECT_ID('dbo.uspAddItem', 'P') IS NOT NULL
+    DROP PROCEDURE dbo.uspAddItem
+GO
+--Dodawanie przedmiotów do bazy. Nale¿y tego u¿ywaæ zamiast zwyk³ych insertów
+CREATE PROCEDURE dbo.uspAddItem (@name NVARCHAR(30), @description TEXT, @category NVARCHAR(30))
+AS 
+	BEGIN TRY 
+		DECLARE @tranCount INT = @@TRANCOUNT
+			
+		IF @tranCount = 0
+			BEGIN TRAN uspAddItem
+		ELSE
+			SAVE TRAN uspAddItem
+
+			IF NOT EXISTS (SELECT Id FROM dbo.Categories WHERE Category LIKE @category)
+				RAISERROR(50001,-1,-1)
+
+			DECLARE @catId INT
+			DECLARE @id INT
+			SET @id = NEXT VALUE FOR ProductsSequence
+			SET @catId = (SELECT TOP 1 Id FROM dbo.Categories WHERE Category LIKE @category)
+	
+			INSERT INTO dbo.Items VALUES (@id, @name, @catId)
+			INSERT INTO dbo.Products VALUES (@id, @description)
+
+			COMMIT TRAN uspAddItem
+	END TRY
+	BEGIN CATCH 
+		ROLLBACK TRAN uspAddItem
+		EXEC dbo.uspDisplayErrors
+	END CATCH
+GO
+
+
+IF OBJECT_ID('dbo.uspAddService', 'P') IS NOT NULL
+    DROP PROCEDURE dbo.uspAddService
+GO
+--Dodawanie us³ug do bazy. Nale¿y tego u¿ywaæ zamiast zwyk³ych insertów
+CREATE PROCEDURE dbo.uspAddService (@name NVARCHAR(30), @time INT, @description TEXT, @category NVARCHAR(30))
+AS 
+	BEGIN TRY 
+			DECLARE @tranCount INT = @@TRANCOUNT
+			
+			IF @tranCount = 0
+				BEGIN TRAN uspAddServicesTran
+			ELSE
+				SAVE TRAN uspAddServicesTran
+
+				IF NOT EXISTS (SELECT Id FROM dbo.Categories WHERE Category LIKE @category)
+				BEGIN 
+					RAISERROR(50001,-1,-1)
+				END
+
+				DECLARE @catId INT
+				DECLARE @id INT
+				SET @id = NEXT VALUE FOR dbo.ProductsSequence
+				SET @catId = (SELECT TOP 1 Id FROM dbo.Categories WHERE Category LIKE @category)
+	
+				INSERT INTO dbo.Services(Id, Name, Time, CategoriesID) VALUES (@id, @name, @time, @catId)
+				INSERT INTO dbo.Products VALUES (@id, @description)
+
+			COMMIT TRAN uspAddServicesTran
+	END TRY
+	BEGIN CATCH 
+		ROLLBACK TRAN uspAddServicesTran
+		EXEC dbo.uspDisplayErrors
+	END CATCH
+GO
+
+IF OBJECT_ID('dbo.uspSellItem', 'P') IS NOT NULL
+    DROP PROCEDURE dbo.uspSellItem
+GO
+--Sprzedwanie przedmiotu
+CREATE PROCEDURE dbo.uspSellItem (@id INT, @warehouse INT = NULL, @quantity INT = 1)
+AS
+	BEGIN TRY	
+		IF @warehouse IS NULL
+		BEGIN
+			
+			DECLARE @SumQuantity INT = dbo.ufnCountItemsInWarehouse(@id,NULL);
+
+			IF @SumQuantity < @quantity 
+				RAISERROR(50002,-1,-1)
+
+			DECLARE @IdWar INT
+			DECLARE K_WareHouse CURSOR 
+			FOR SELECT Id FROM Warehouse FOR READ ONLY
+			Open K_WareHouse 
+			FETCH K_WareHouse INTO @IdWar 
+			
+			DECLARE @tempQuant INT = @quantity;
+			WHILE (@@FETCH_STATUS<>-1) AND (@tempQuant >= 0)
+			BEGIN
+				SET @SumQuantity = (SELECT SUM(Quantity) FROM ItemsInWarehouse WHERE ItemsId = @id AND WarehouseId = @IdWar)
+				IF (@tempQuant >= @SumQuantity )
+				BEGIN
+					SET @tempQuant -= @SumQuantity;
+					UPDATE ItemsInWarehouse SET quantity = 0 WHERE ItemsId = @id AND WarehouseId = @IdWar
+				END
+				ELSE
+				BEGIN 
+					UPDATE ItemsInWarehouse SET quantity -= @tempQuant WHERE ItemsId = @id AND WarehouseId = @IdWar
+					SET @tempQuant = 0;	
+				END
+					FETCH K_WareHouse INTO @IdWar 
+			END
+
+			CLOSE K_WareHouse 
+			DEALLOCATE K_WareHouse 
+
+		END
+		ELSE 
+		BEGIN 
+				IF NOT EXISTS (SELECT Quantity FROM dbo.ItemsInWarehouse 
+								WHERE ItemsId = @id AND WarehouseId = @warehouse AND Quantity >= @quantity)
+					RAISERROR(50002,-1,-1)
+			
+
+				UPDATE ItemsInWarehouse SET Quantity -= @quantity
+				WHERE ItemsId = @id AND WarehouseId = @warehouse
+
+		END
+	
+		
+	END TRY
+	BEGIN CATCH
+		EXEC dbo.uspDisplayErrors
+	END CATCH
+GO
+------------------------------------------------------- KONIEC PROCEDUR
