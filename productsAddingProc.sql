@@ -69,7 +69,7 @@ AS
 		EXEC uspDisplayErrors
 	END CATCH
 GO
-													 --wersja alternatywna
+	
 CREATE PROCEDURE dbo.uspSellItem (@id INT, @warehouse INT = NULL, @quantity INT = 1)
 AS
 	BEGIN TRY
@@ -121,12 +121,13 @@ AS
 				WHERE ItemsId = @id AND WarehouseId = @warehouse
 
 		END
-	
+
+		RETURN 1
 		
 	END TRY
 	BEGIN CATCH
 		EXEC dbo.uspDisplayErrors
+		RETURN -1
 	END CATCH
 GO
-											 
 													 
