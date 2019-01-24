@@ -191,6 +191,16 @@ BEGIN
 	RETURN
 END
 GO
+								 
+--Pobieramy cene produktu z danej daty :D 
+CREATE FUNCTION GetPrice(@id INT,@date DATETIME)
+RETURNS MONEY
+AS
+BEGIN
+	
+	RETURN (SELECT UnitPrice  FROM ProductsPrices WHERE ProductsId = @id AND @date BETWEEN StartDate AND EndDate)
+END
+GO
 	
 --Returns active clients in given time period and the number of purchases of every client
 CREATE FUNCTION GetActiveClients(@start DATETIME, @end DATETIME)
