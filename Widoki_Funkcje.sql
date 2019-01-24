@@ -12,7 +12,7 @@ AS
 	ORDER BY AddDate DESC
 GO
 
-!--bardzo ładny tutaj view jak mnie uczyli na zajeciach mi sie podoba nie zadna funkcja
+--bardzo ładny tutaj view jak mnie uczyli na zajeciach mi sie podoba nie zadna funkcja
 CREATE VIEW itemsToSend
 AS
 	SELECT O.Id, O.Country, O.City, O.Address, OD.ProductsId, OD.Quantity FROM Status AS S JOIN OrdersStatus AS OS
@@ -22,7 +22,7 @@ AS
 	WHERE S.StatusInfo LIKE N'TO SEND' 
 GO
 
-!--zajebisty widoczek tylko mozna z niego zrobic funkcje ale nie wiem w sumie czy telega woli widoki czy funkcje
+--zajebisty widoczek tylko mozna z niego zrobic funkcje ale nie wiem w sumie czy telega woli widoki czy funkcje
 DROP VIEW topBuyers
 CREATE VIEW topBuyers
 AS
@@ -33,7 +33,7 @@ AS
 	ORDER BY TotalSpend DESC 
 GO
 
-!--superancko
+--superancko
 CREATE FUNCTION topSellers(@startDate DATETIME, @endDate DATETIME, @number INT = 5)
 RETURNS @outputTable TABLE(ProductID INT, UnitsSold INT)
 AS
@@ -47,7 +47,7 @@ BEGIN
 END
 GO
 
-!--funkcyja liczy ile miesiecy minelo bo potrzebuje do nastepnej funkcji (super zastosowanie tomek polecam)
+--funkcyja liczy ile miesiecy minelo bo potrzebuje do nastepnej funkcji (super zastosowanie tomek polecam)
 CREATE FUNCTION FullMonthsSeparation 
 (
     @DateA DATETIME,
@@ -92,7 +92,7 @@ BEGIN
 END
 GO
 
-!--Boze jaka super funkcja jakbym mial kiedys baze danych chcialbym zeby taka w niej byla
+--Boze jaka super funkcja jakbym mial kiedys baze danych chcialbym zeby taka w niej byla
 CREATE FUNCTION salaries(@startDate DATETIME, @endDate DATETIME)
 RETURNS @outputTable TABLE(Name NVARCHAR(30), Surname NVARCHAR(30), Earnings INT)
 AS
@@ -110,3 +110,17 @@ BEGIN
 	RETURN
 END
 GO
+
+--Returns name from given ID
+CREATE FUNCTION GetName(@id INT)
+RETURNS VARCHAR(100)
+AS
+BEGIN
+	DECLARE @output VARCHAR(100)
+	SET @output = (SELECT I.Name FROM Items AS I WHERE I.id = @id)
+	IF (@output IS NULL)
+	BEGIN
+		SET @output = (SELECT S.Name FROM Services AS S WHERE S.id = @id)
+	END
+	RETURN @output
+END
