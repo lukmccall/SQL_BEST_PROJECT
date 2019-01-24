@@ -126,6 +126,7 @@ BEGIN
 	END
 	RETURN @output
 END
+GO
 
 --Sel-explanatory returns best rated products
 CREATE VIEW SortByRating
@@ -145,4 +146,13 @@ BEGIN
 	FROM OrdersStatus AS OS
 	RETURN
 END
+GO
+
+--Returns active services combined with client informations
+CREATE VIEW ActiveClients
+AS
+	SELECT P.Id AS [ClientID], A.ServicesId AS [ServiceID], P.Name, P.Surname, A.StartDate, A.EndDate 
+	FROM ActiveServices AS A 
+	JOIN Clients AS C ON A.ClientsLogin = C.Login
+	JOIN People AS P ON P.Id = C.PeopleId
 GO
