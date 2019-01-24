@@ -166,3 +166,11 @@ BEGIN
 	RETURN 0
 END
 GO
+
+--Returns sum of all items in all warehouses
+CREATE VIEW SumItems
+AS
+	SELECT IW.ItemsId AS [ID], (SELECT DISTINCT I.Name FROM Items AS I WHERE I.Id = IW.ItemsId) AS [Name], SUM(IW.Quantity) AS [Sum] 
+	FROM ItemsInWarehouse AS IW JOIN Warehouse AS W ON IW.WarehouseId = W.Id
+	GROUP BY IW.ItemsId
+GO
