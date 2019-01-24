@@ -69,3 +69,64 @@ AS
 		EXEC uspDisplayErrors
 	END CATCH
 GO
+													 --wersja alternatywna
+CREATE PROCEDURE dbo.uspSellItem (@id INT, @warehouse INT = NULL, @quantity INT = 1)
+AS
+	BEGIN TRY
+
+		
+		IF @warehouse IS NULL
+		BEGIN
+			
+			DECLARE @SumQuantity INT = dbo.ufnCountItemsInWarehouse(@id,NULL);
+
+			IF @SumQuantity < @quantity 
+				RAISERROR(50002,-1,-1) --Ukesz popraw bo ja nie wiem co to za error ;-;
+
+			DECLARE @IdWar INT
+			DECLARE K_WareHouse CURSOR 
+			FOR SELECT Id FROM Warehouse FOR READ ONLY
+			Open K_WareHouse 
+			FETCH K_WareHouse INTO @IdWar 
+			
+			DECLARE @tempQuant INT = @quantity;
+			WHILE (@@FETCH_STATUS<>-1) AND (@tempQuant >= 0)
+			BEGIN
+				SET @SumQuantity = (SELECT SUM(Quantity) FROM ItemsInWarehouse WHERE ItemsId = @id AND WarehouseId = @IdWar)
+				IF (@tempQuant >= @SumQuantity )
+				BEGIN
+					SET @tempQuant -= @SumQuantity;
+					UPDATE ItemsInWarehouse SET quantity = 0 WHERE ItemsId = @id AND WarehouseId = @IdWar
+				END
+				ELSE
+				BEGIN 
+					UPDATE ItemsInWarehouse SET quantity -= @tempQuant WHERE ItemsId = @id AND WarehouseId = @IdWar
+					SET @tempQuant = 0;	
+				END
+					FETCH K_WareHouse INTO @IdWar 
+			END
+
+			CLOSE K_WareHouse 
+			DEALLOCATE K_WareHouse 
+
+		END
+		ELSE 
+		BEGIN 
+				IF NOT EXISTS (SELECT Quantity FROM dbo.ItemsInWarehouse 
+								WHERE ItemsId = @id AND WarehouseId = @warehouse AND Quantity >= @quantity)
+					RAISERROR(50002,-1,-1)
+			
+
+				UPDATE ItemsInWarehouse SET Quantity -= @quantity
+				WHERE ItemsId = @id AND WarehouseId = @warehouse
+
+		END
+	
+		
+	END TRY
+	BEGIN CATCH
+		EXEC dbo.uspDisplayErrors
+	END CATCH
+GO
+											 
+													 
