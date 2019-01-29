@@ -150,7 +150,7 @@ IF OBJECT_ID('dbo.Logs', 'U') IS NOT NULL
 GO
 CREATE TABLE Logs( 
 	 Id INT IDENTITY(1,1),
-	 Date DATETIME , 
+	 Date DATETIME DEFAULT GETDATE(), 
      Info TEXT , 
      Level CHAR(1)
 ) 
@@ -207,7 +207,7 @@ CREATE TABLE OrdersDetails (
     ProductsId   INT NOT NULL,
     UnitPrice     money NOT NULL,
     Quantity      SMALLINT NOT NULL,
-    Discount      REAL NOT NULL
+    Discount      INT NOT NULL
 )
 GO
 
@@ -309,7 +309,7 @@ GO
 CREATE TABLE Positions (
     Id         INT IDENTITY(1,1),
     Position   nvarchar(30) NOT NULL, 
-	salary INT NOT NULL ) 
+	Salary INT NOT NULL ) 
 GO
 
 ALTER TABLE Positions ADD constraint Positions_PK PRIMARY KEY CLUSTERED (Id)
@@ -392,7 +392,7 @@ IF OBJECT_ID('dbo.Sales', 'U') IS NOT NULL
 GO
 CREATE TABLE Sales (
     ProductsId   INT NOT NULL,
-    Unitprice     money NOT NULL,
+    UnitPrice     money NOT NULL,
     Until         datetime NOT NULL
 )
 GO
@@ -409,7 +409,7 @@ GO
 CREATE TABLE Services (
     Id			 INT NOT NULL,
     Name		 nvarchar (30) NOT NULL, 
-    Time	     DATETIME , 
+    Time	     INT , 
     CategoriesId INT NOT NULL ) 
 GO
 
@@ -428,7 +428,7 @@ CREATE TABLE Warehouse (
 	Country nvarchar(30) NOT NULL,
 	City	nvarchar(30) NOT NULL,
     Address nvarchar(30) NOT NULL, 
-	Phone INT    NOT NULL                  
+	Phone nvarchar(12)    NOT NULL                  
 )
 GO
 
@@ -653,7 +653,7 @@ GO
 
 ------------------------------------------------------- FUNKCJE
 IF OBJECT_ID ( 'dbo.ufnTopSellers', 'F' ) IS NOT NULL   
-    DROP PROCEDURE dbo.uspDisplayErrors;  
+    DROP FUNCTION dbo.ufnTopSellers;  
 GO 
 -- Najlepiej sprzedaj¹ce siê produkty w podanym przedziale
 CREATE FUNCTION ufnTopSellers(@startDate DATETIME, @endDate DATETIME)
@@ -670,7 +670,7 @@ END
 GO
 
 IF OBJECT_ID ( 'dbo.ufnFullMonthsSeparation', 'F' ) IS NOT NULL   
-    DROP PROCEDURE dbo.ufnFullMonthsSeparation;  
+    DROP FUNCTION dbo.ufnFullMonthsSeparation;  
 GO 
 --Funkcja licz¹ca ile miesiecy minelo
 CREATE FUNCTION ufnFullMonthsSeparation 
@@ -718,7 +718,7 @@ END
 GO
 
 IF OBJECT_ID ( 'dbo.ufnSalaries', 'F' ) IS NOT NULL   
-    DROP PROCEDURE dbo.ufnSalaries;  
+    DROP FUNCTION dbo.ufnSalaries;  
 GO 
 --Funkcja zwracaj¹ca ile zarobili procownicy w danym okresie czasu
 CREATE FUNCTION ufnSalaries(@startDate DATETIME, @endDate DATETIME)
@@ -740,14 +740,14 @@ END
 GO
 
 IF OBJECT_ID ( 'dbo.ufnGetProductName', 'F' ) IS NOT NULL   
-    DROP PROCEDURE dbo.ufnGetProductName;  
+    DROP FUNCTION dbo.ufnGetProductName;  
 GO 
 --Zwraca nazwê produktu po zadanym id
 CREATE FUNCTION ufnGetProductName(@id INT)
-RETURNS VARCHAR(100)
+RETURNS NVARCHAR(100)
 AS
 BEGIN
-	DECLARE @output VARCHAR(100)
+	DECLARE @output NVARCHAR(100)
 	SET @output = (SELECT I.Name FROM Items AS I WHERE I.id = @id)
 	IF (@output IS NULL)
 	BEGIN
@@ -758,9 +758,9 @@ END
 GO
 
 IF OBJECT_ID ( 'dbo.ufnCheckStatus', 'F' ) IS NOT NULL   
-    DROP PROCEDURE dbo.ufnCheckStatus;  
+    DROP FUNCTION dbo.ufnCheckStatus;  
 GO 
---Zwraca statusy zamówieñ z datami p³atnoœci
+--Zwraca statusy zamówieñ wraz z jego datami p³atnoœci
 CREATE FUNCTION ufnCheckStatus(@id INT)
 RETURNS @output TABLE(OrderID INT, Status TEXT, Name TEXT, PaymentDate DATETIME) 
 AS
@@ -773,20 +773,20 @@ END
 GO
 
 IF OBJECT_ID ( 'dbo.ufnIsCodeActive', 'F' ) IS NOT NULL   
-    DROP PROCEDURE dbo.ufnIsCodeActive;  
+    DROP FUNCTION dbo.ufnIsCodeActive;  
 GO 
 --Sprawdza czy dany kod zosta³ ju¿ u¿yty, czy nie
 CREATE FUNCTION ufnIsCodeActive(@id INT) RETURNS BIT
 AS
 BEGIN
-	IF (EXISTS (SELECT 1 FROM PromotionCodes AS PC WHERE PC.Id = @id AND PC.ExpirDate > GETDATE()))
+	IF (EXISTS (SELECT 1 FROM PromotionCodes AS PC WHERE PC.Id = @id AND PC.ExpirDate > GETDATE() AND PC.ClientsLogin IS NULL))
 		RETURN 1
 	RETURN 0
 END
 GO
 
 IF OBJECT_ID ( 'dbo.ufnGetEmployees', 'F' ) IS NOT NULL   
-    DROP PROCEDURE dbo.ufnGetEmployees;  
+    DROP FUNCTION dbo.ufnGetEmployees;  
 GO 
 --Zwraca wszystkich pracowników na danej pozycji
 CREATE FUNCTION ufnGetEmployees(@positionID INT)
@@ -923,9 +923,9 @@ GO
 -- Produkty posortowane po ocenach
 CREATE VIEW SortByRating
 AS
-	SELECT TOP 100 PERCENT R.ProductsId, AVG(R.Rating) AS [Average Rating] FROM Ratings AS R 
+	SELECT TOP 100 PERCENT R.ProductsId, AVG(R.Rating) AS [AverageRating] FROM Ratings AS R
 	GROUP BY R.ProductsId
-	ORDER BY [Average Rating]
+	ORDER BY [AverageRating]
 GO
 
 
@@ -935,7 +935,7 @@ GO
 -- Klienci z aktywnymi us³ugami 
 CREATE VIEW ActiveClients
 AS
-	SELECT P.Id AS [ClientID], A.ServicesId AS [ServiceID], P.Name, P.Surname, A.StartDate, A.EndDate 
+	SELECT P.Id AS [ClientId], A.ServicesId AS [ServiceID], P.Name, P.Surname, A.StartDate, A.EndDate 
 	FROM ActiveServices AS A 
 	JOIN Clients AS C ON A.ClientsLogin = C.Login
 	JOIN People AS P ON P.Id = C.PeopleId
@@ -948,7 +948,7 @@ GO
 --Sumy wszystkich przedmiotów w magazynach
 CREATE VIEW SumItems
 AS
-	SELECT IW.ItemsId AS [ID], (SELECT DISTINCT I.Name FROM Items AS I WHERE I.Id = IW.ItemsId) AS [Name], SUM(IW.Quantity) AS [Sum] 
+	SELECT IW.ItemsId AS [Id], (SELECT DISTINCT I.Name FROM Items AS I WHERE I.Id = IW.ItemsId) AS [Name], SUM(IW.Quantity) AS [Sum] 
 	FROM ItemsInWarehouse AS IW JOIN Warehouse AS W ON IW.WarehouseId = W.Id
 	GROUP BY IW.ItemsId
 GO
@@ -1087,3 +1087,15 @@ AS
 	END CATCH
 GO
 ------------------------------------------------------- KONIEC PROCEDUR
+------------------------------------------------------- TRIGGERY
+IF OBJECT_ID ('[LogPayments] ', 'TR') IS NOT NULL
+   DROP TRIGGER LogPayments;
+GO
+-- Dodawanie logów przy p³atnoœci
+CREATE TRIGGER LogPayments ON dbo.Payments
+AFTER INSERT 
+AS 
+	INSERT INTO Logs(Info, Level)
+	SELECT N'Zamówienie nr ' +  CONVERT(VARCHAR(20),OrdersId) + N' zosta³o p³acone', 'I' FROM inserted
+GO
+------------------------------------------------------- KONIEC TRIGGERÓW
