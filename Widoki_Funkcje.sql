@@ -231,3 +231,14 @@ CREATE VIEW GetActivePromotionCodes
 AS
 	SELECT PC.ProductsId, PC.Code, PC.ExpirDate FROM PromotionCodes AS PC
 	WHERE PC.ClientsLogin IS NULL
+						  
+
+--Zwraca wszystkie kupony uzyte przez jakiegos klienta i do jakich zamowien to uzywal						  
+CREATE FUNCTION UsedPromotionCodes(@Login NVARCHAR(30))
+RETURNS @outputTable TABLE (CodeID INT, Code NVARCHAR(10), ProductID INT, Discount INT, OrderID INT)
+AS
+BEGIN
+	INSERT INTO @outputTable SELECT PC.Id, PC.Code, PC.ProductsId, PC.Discount, PC.OrdersID FROM PromotionCodes AS PC 
+	WHERE PC.ClientsLogin IS NOT NULL AND PC.ClientsLogin = @Login
+	RETURN
+END
