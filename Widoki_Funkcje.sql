@@ -216,3 +216,13 @@ BEGIN
 	WHERE ((SELECT COUNT(O.Id) FROM Orders AS O WHERE C.Login = O.ClientsLogin AND O.PurchaseDate >= @start AND O.PurchaseDate <= @end GROUP BY O.ClientsLogin) > 0)
 	RETURN
 END 
+
+--Wypisuje logi z danego dnia 
+CREATE FUNCTION GetLogs(@date DATETIME)
+RETURNS @outputTable TABLE (Info TEXT, Level CHAR(1))
+AS
+BEGIN
+	INSERT INTO @outputTable SELECT L.Info, L.Level FROM Logs AS L WHERE CAST(L.Date AS DATE) = CAST(@date AS DATE)
+	RETURN
+END 		    
+		    
