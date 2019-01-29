@@ -241,4 +241,9 @@ BEGIN
 	INSERT INTO @outputTable SELECT PC.Id, PC.Code, PC.ProductsId, PC.Discount, PC.OrdersID FROM PromotionCodes AS PC 
 	WHERE PC.ClientsLogin IS NOT NULL AND PC.ClientsLogin = @Login
 	RETURN
+						   
+--Nom nie wiem co juz dopisac ale na pewno sie przyda bo mamy strone i musimy jakos pobierac ladnie te newsy posortowane					   
+CREATE VIEW GetNews
+AS
+	SELECT * FROM NEWS AS N ORDER BY N.Date DESC
 END
