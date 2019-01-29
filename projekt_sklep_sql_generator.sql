@@ -357,7 +357,6 @@ CREATE TABLE PromotionCodes (
     Id				INT IDENTITY(1,1),
 	ProductsId		INT NOT NULL,
 	Discount		INT,
-    Used			bit DEFAULT 0 ,
     Code			nvarchar (10) NOT NULL, 
     ExpirDate		DATETIME NOT NULL , 
     ClientsLogin	NVARCHAR (30),
@@ -806,18 +805,11 @@ BEGIN
 END
 GO
 
----------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
----------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
----------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
----------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
----------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
----------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
----------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
----------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
--- A to nie wiem co ma robiæ xDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
-/*
---Returns active clients in given time period and the number of purchases of every client
-CREATE FUNCTION GetActiveClients(@start DATETIME, @end DATETIME)
+IF OBJECT_ID('dbo.ufnGetActiveClients', 'FN') IS NOT NULL
+    DROP FUNCTION dbo.ufnGetActiveClients
+GO
+-- Zwraca klientów, którzy dokonali zakupów w danym przedziale czasowym
+CREATE FUNCTION ufnGetActiveClients(@start DATETIME, @end DATETIME)
 RETURNS @output TABLE(ClientID INT,
 						ClientName NVARCHAR(30),
 						ClientSurname NVARCHAR(30),
@@ -830,7 +822,7 @@ BEGIN
 	WHERE ((SELECT COUNT(O.Id) FROM Orders AS O WHERE C.Login = O.ClientsLogin AND O.PurchaseDate >= @start AND O.PurchaseDate <= @end GROUP BY O.ClientsLogin) > 0)
 	RETURN
 END
-*/ 
+GO
 
 IF OBJECT_ID('dbo.ufnCountItemsInWarehouse', 'FN') IS NOT NULL
     DROP FUNCTION dbo.ufnCountItemsInWarehouse
@@ -848,6 +840,32 @@ BEGIN
 END
 GO
 
+IF OBJECT_ID('dbo.ufnGetLogs', 'FN') IS NOT NULL
+    DROP FUNCTION dbo.ufnGetLogs
+GO
+-- Fukncja zwracaj¹ca logi z danego dnia
+CREATE FUNCTION ufnGetLogs(@date DATETIME)
+RETURNS @outputTable TABLE (Info TEXT, Level CHAR(1))
+AS
+BEGIN
+	INSERT INTO @outputTable SELECT L.Info, L.Level FROM Logs AS L WHERE CAST(L.Date AS DATE) = CAST(@date AS DATE)
+	RETURN
+END 
+GO
+
+IF OBJECT_ID('dbo.ufnUsedPromotionCodes', 'FN') IS NOT NULL
+    DROP FUNCTION dbo.ufnUsedPromotionCodes
+GO
+-- Zwraca kody u¿yte przez u¿ytkowinika z danym loginem
+CREATE FUNCTION ufnUsedPromotionCodes(@Login NVARCHAR(30))
+RETURNS @outputTable TABLE (CodeID INT, Code NVARCHAR(10), ProductID INT, Discount INT, OrderID INT)
+AS
+BEGIN
+	INSERT INTO @outputTable SELECT PC.Id, PC.Code, PC.ProductsId, PC.Discount, PC.OrdersID FROM PromotionCodes AS PC 
+	WHERE PC.ClientsLogin IS NOT NULL AND PC.ClientsLogin = @Login
+	RETURN
+END
+GO
 ------------------------------------------------------- KONIEC FUNKCJI
 
 ------------------------------------------------------- WIDOKI 
@@ -910,16 +928,11 @@ AS
 	ORDER BY [Average Rating]
 GO
 
----------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
----------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
----------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
----------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
----------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
----------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
----------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
----------------------------------------------------------------------------------TOMASZ T£UMACZ SIÊ
--- A to nie wiem co ma robiæ xDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
-/*
+
+IF OBJECT_ID ( 'ActiveClients', 'v' ) IS NOT NULL   
+    DROP VIEW ActiveClients;  
+GO
+-- Klienci z aktywnymi us³ugami 
 CREATE VIEW ActiveClients
 AS
 	SELECT P.Id AS [ClientID], A.ServicesId AS [ServiceID], P.Name, P.Surname, A.StartDate, A.EndDate 
@@ -927,7 +940,7 @@ AS
 	JOIN Clients AS C ON A.ClientsLogin = C.Login
 	JOIN People AS P ON P.Id = C.PeopleId
 GO
-*/
+
 
 IF OBJECT_ID ( 'SumItems', 'v' ) IS NOT NULL   
     DROP VIEW SumItems;  
