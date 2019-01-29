@@ -224,5 +224,10 @@ AS
 BEGIN
 	INSERT INTO @outputTable SELECT L.Info, L.Level FROM Logs AS L WHERE CAST(L.Date AS DATE) = CAST(@date AS DATE)
 	RETURN
-END 		    
-		    
+END 		 
+						  
+--Zwraca kupony ktore nie byly jeszcze uzyte
+CREATE VIEW GetActivePromotionCodes
+AS
+	SELECT PC.ProductsId, PC.Code, PC.ExpirDate FROM PromotionCodes AS PC
+	WHERE PC.ClientsLogin IS NULL
