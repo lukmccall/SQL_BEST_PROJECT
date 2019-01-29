@@ -5,7 +5,7 @@ GO
 CREATE TABLE ActiveServices (
     ServicesId     INT NOT NULL,
     ClientsLogin   nvarchar (30) NOT NULL, 
-    StartDate      datetime NOT NULL,
+    StartDate      datetime DEFAULT GETDATE(),
     EndDate        datetime NOT NULL
 )
 GO
@@ -22,7 +22,7 @@ IF OBJECT_ID('dbo.BonusSalary', 'U') IS NOT NULL
 GO
 CREATE TABLE BonusSalary ( 
 	EmployeesId INT NOT NULL, 
-	ReceivedDate DATE NOT NULL,
+	ReceivedDate DATE DEFAULT GETDATE(),
 	BonusSalary money NOT NULL,
 	ReceiveFor nvarchar (30) DEFAULT N'Bonus' )
 GO
@@ -70,7 +70,7 @@ GO
 CREATE TABLE Comments ( 
 	NewsId INT NOT NULL , 
     ClientsLogin NVARCHAR(30) NOT NULL,
-    AddDate DATETIME NOT NULL,
+    AddDate DATETIME DEFAULT GETDATE(),
 	CommentBody text
 )
 GO
@@ -86,7 +86,7 @@ IF OBJECT_ID('dbo.Employees', 'U') IS NOT NULL
 GO
 CREATE TABLE Employees (
     PeopleId      INT NOT NULL,
-    HireDate       DATE NOT NULL,
+    HireDate       DATE DEFAULT GETDATE(),
     PositionsId   INT NOT NULL,
     BossId           INT
 )
@@ -104,7 +104,7 @@ GO
 CREATE TABLE ExpiredServices (
 	ServicesId     INT NOT NULL,
     ClientsLogin   nvarchar (30) NOT NULL,
-    StartDate      datetime NOT NULL,
+    StartDate      datetime DEFAULT GETDATE(),
     EndDate        datetime NOT NULL
 ) 
 GO
@@ -152,7 +152,7 @@ CREATE TABLE Logs(
 	 Id INT IDENTITY(1,1),
 	 Date DATETIME DEFAULT GETDATE(), 
      Info TEXT , 
-     Level CHAR(1)
+     Level CHAR(1) DEFAULT 'I'
 ) 
 GO
 
@@ -169,7 +169,7 @@ CREATE TABLE News (
 	Id INT IDENTITY(1,1), 
     Topic nvarchar(30) NOT NULL,
 	NewsBody text NOT NULL, 
-	Date datetime 
+	Date datetime DEFAULT GETDATE()
 )
 GO
 
@@ -184,7 +184,7 @@ IF OBJECT_ID('dbo.Orders', 'U') IS NOT NULL
 GO
 CREATE TABLE Orders (
     Id             INT IDENTITY(1,1),
-    PurchaseDate   datetime,
+    PurchaseDate   datetime DEFAULT GETDATE(),
     City           nvarchar (30) , 
     Country		   NVARCHAR (30) , 
     Address		   NVARCHAR (30) , 
@@ -254,7 +254,7 @@ CREATE TABLE Payments (
 	Id				INT IDENTITY(1,1), 
 	PaymentsTypsId	INT NOT NULL , 
     OrdersId		INT NOT NULL,
-    PaymentDate		DATETIME , 
+    PaymentDate		DATETIME DEFAULT GETDATE(), 
     Value			MONEY
 )
 Go
@@ -309,7 +309,7 @@ GO
 CREATE TABLE Positions (
     Id         INT IDENTITY(1,1),
     Position   nvarchar(30) NOT NULL, 
-	Salary INT NOT NULL ) 
+	Salary	INT NOT NULL ) 
 GO
 
 ALTER TABLE Positions ADD constraint Positions_PK PRIMARY KEY CLUSTERED (Id)
@@ -338,8 +338,8 @@ IF OBJECT_ID('dbo.ProductsPrices', 'U') IS NOT NULL
 GO
 CREATE TABLE ProductsPrices (
     ProductsId   INT NOT NULL,
-    StartDate     datetime NOT NULL,
-    EndDate       datetime,
+    StartDate     datetime DEFAULT GETDATE(),
+    EndDate       datetime DEFAULT NULL,
     UnitPrice     money
 )
 GO
@@ -377,7 +377,7 @@ CREATE TABLE Ratings(
 	ClientsLogin nvarchar (30) NOT NULL ,
 	ProductsId INT NOT NULL, 
     Rating SMALLINT NOT NULL, 
-    AddDate DATETIME NOT NULL
+    AddDate DATETIME DEFAULT GETDATE()
 ) 
 GO
 
@@ -1088,14 +1088,14 @@ AS
 GO
 ------------------------------------------------------- KONIEC PROCEDUR
 ------------------------------------------------------- TRIGGERY
-IF OBJECT_ID ('[LogPayments] ', 'TR') IS NOT NULL
+IF OBJECT_ID ('LogPayments', 'TR') IS NOT NULL
    DROP TRIGGER LogPayments;
 GO
 -- Dodawanie logów przy p³atnoœci
 CREATE TRIGGER LogPayments ON dbo.Payments
 AFTER INSERT 
 AS 
-	INSERT INTO Logs(Info, Level)
+	INSERT INTO dbo.Logs(Info, Level)
 	SELECT N'Zamówienie nr ' +  CONVERT(VARCHAR(20),OrdersId) + N' zosta³o p³acone', 'I' FROM inserted
 GO
 ------------------------------------------------------- KONIEC TRIGGERÓW
