@@ -56,3 +56,17 @@ BEGIN CATCH
 	EXEC dbo.uspDisplayErrors
 END CATCH
 GO
+
+								
+CREATE TRIGGER NewPrice ON ProductsPrices
+INSTEAD OF INSERT 
+AS 
+	DECLARE @Time DATETIME = GETDATE()
+	UPDATE ProductsPrices SET EndDate=@Time
+	FROM inserted I JOIN ProductsPrices PP ON I.ProductsId=PP.ProductsId
+ 	WHERE PP.EndDate = '9999-12-31' 
+
+	INSERT INTO ProductsPrices SELECT I.ProductsId, @Time, '9999-12-31', I.UnitPrice 
+	FROM inserted I 
+
+GO					
