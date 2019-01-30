@@ -10,7 +10,7 @@ CREATE TABLE ActiveServices (
 )
 GO
 
-ALTER TABLE ActiveServices ADD constraint ActiveServices_PK PRIMARY KEY CLUSTERED (lServicesId, ClientsLogin, EndDate)
+ALTER TABLE ActiveServices ADD constraint ActiveServices_PK PRIMARY KEY CLUSTERED (ServicesId, ClientsLogin, EndDate)
      WITH (
      ALLOW_PAGE_LOCKS = ON , 
      ALLOW_ROW_LOCKS = ON ) 
