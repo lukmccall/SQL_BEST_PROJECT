@@ -628,7 +628,7 @@ IF OBJECT_ID('ProductsSequence', 'SO') IS NOT NULL
 BEGIN
     DROP SEQUENCE ProductsSequence
 END
--- Sekwencja, id dla us³ug i przedmiotów 
+-- Sekwencja, id dla usług i przedmiotów 
 CREATE SEQUENCE ProductsSequence 
     START WITH 1  
     INCREMENT BY 1
@@ -660,11 +660,10 @@ EXEC sp_addmessage 50006, 16,
 GO  
 
 
-
 IF OBJECT_ID ( 'dbo.uspDisplayErrors', 'P' ) IS NOT NULL   
     DROP PROCEDURE dbo.uspDisplayErrors;  
 GO  
--- Procedura wywo³uj¹ca b³êd z poziomu bloku catch 
+-- Procedura wywoąująca błąd z poziomu bloku catch 
 CREATE PROCEDURE uspDisplayErrors 
 AS 
 	DECLARE @ErrorMessage NVARCHAR(4000);  
@@ -685,10 +684,13 @@ GO
 ------------------------------------------------------- KONIEC INFORMACJI O B£ÊDACH
 
 ------------------------------------------------------- FUNKCJE
-IF OBJECT_ID ( 'dbo.ufnTopSellers', 'F' ) IS NOT NULL   
+IF EXISTS (SELECT *
+               FROM   sys.objects
+               WHERE  object_id = OBJECT_ID(N'dbo.ufnTopSellers')
+                      AND type IN ( N'FN', N'IF', N'TF', N'FS', N'FT' ))    
     DROP FUNCTION dbo.ufnTopSellers;  
 GO 
--- Najlepiej sprzedaj¹ce siê produkty w podanym przedziale
+-- Najlepiej sprzedające sie produkty w podanym przedziale
 CREATE FUNCTION ufnTopSellers(@startDate DATETIME, @endDate DATETIME)
 RETURNS @outputTable TABLE(ProductID INT, UnitsSold INT)
 AS
@@ -702,10 +704,13 @@ BEGIN
 END
 GO
 
-IF OBJECT_ID ( 'dbo.ufnFullMonthsSeparation', 'F' ) IS NOT NULL   
+IF EXISTS (SELECT *
+               FROM   sys.objects
+               WHERE  object_id = OBJECT_ID(N'dbo.ufnFullMonthsSerparation')
+                      AND type IN ( N'FN', N'IF', N'TF', N'FS', N'FT' ))  
     DROP FUNCTION dbo.ufnFullMonthsSeparation;  
 GO 
---Funkcja licz¹ca ile miesiecy minelo
+--Funkcja licząca ile miesiecy minelo
 CREATE FUNCTION ufnFullMonthsSeparation 
 (
     @DateA DATETIME,
@@ -750,10 +755,13 @@ BEGIN
 END
 GO
 
-IF OBJECT_ID ( 'dbo.ufnSalaries', 'F' ) IS NOT NULL   
+IF EXISTS (SELECT *
+               FROM   sys.objects
+               WHERE  object_id = OBJECT_ID(N'dbo.ufnSalaries')
+                      AND type IN ( N'FN', N'IF', N'TF', N'FS', N'FT' ))  
     DROP FUNCTION dbo.ufnSalaries;  
 GO 
---Funkcja zwracaj¹ca ile zarobili procownicy w danym okresie czasu
+--Funkcja zwracająca ile zarobili procownicy w danym okresie czasu
 CREATE FUNCTION ufnSalaries(@startDate DATETIME, @endDate DATETIME)
 RETURNS @outputTable TABLE(Name NVARCHAR(30), Surname NVARCHAR(30), Earnings MONEY)
 AS
@@ -772,10 +780,13 @@ BEGIN
 END
 GO
 
-IF OBJECT_ID ( 'dbo.ufnGetProductName', 'F' ) IS NOT NULL   
-    DROP FUNCTION dbo.ufnGetProductName;  
+IF EXISTS (SELECT *
+               FROM   sys.objects
+               WHERE  object_id = OBJECT_ID(N'dbo.ufnGetProductName')
+                      AND type IN ( N'FN', N'IF', N'TF', N'FS', N'FT' ))  
+    DROP FUNCTION dbo.ufnGetProductName 
 GO 
---Zwraca nazwê produktu po zadanym id
+--Zwraca nazwę produktu po zadanym id
 CREATE FUNCTION ufnGetProductName(@id INT)
 RETURNS NVARCHAR(100)
 AS
@@ -790,10 +801,13 @@ BEGIN
 END
 GO
 
-IF OBJECT_ID ( 'dbo.ufnCheckStatus', 'F' ) IS NOT NULL   
+IF EXISTS (SELECT *
+               FROM   sys.objects
+               WHERE  object_id = OBJECT_ID(N'dbo.ufnCheckStatus')
+                      AND type IN ( N'FN', N'IF', N'TF', N'FS', N'FT' ))    
     DROP FUNCTION dbo.ufnCheckStatus;  
 GO 
---Zwraca statusy zamówieñ wraz z jego datami p³atnoci
+--Zwraca statusy zamówień wraz z jego datami płatnoci
 CREATE FUNCTION ufnCheckStatus(@id INT)
 RETURNS @output TABLE(OrderID INT, Status TEXT, Name TEXT, PaymentDate DATETIME) 
 AS
@@ -805,10 +819,13 @@ BEGIN
 END
 GO
 
-IF OBJECT_ID ( 'dbo.ufnIsCodeActive', 'F' ) IS NOT NULL   
+IF EXISTS (SELECT *
+               FROM   sys.objects
+               WHERE  object_id = OBJECT_ID(N'dbo.ufnIsCodeActive')
+                      AND type IN ( N'FN', N'IF', N'TF', N'FS', N'FT' ))   
     DROP FUNCTION dbo.ufnIsCodeActive;  
 GO 
---Sprawdza czy dany kod zosta³ ju¿ u¿yty, czy nie
+--Sprawdza czy dany kod został już użyty, czy nie
 CREATE FUNCTION ufnIsCodeActive(@id INT) RETURNS BIT
 AS
 BEGIN
@@ -818,7 +835,10 @@ BEGIN
 END
 GO
 
-IF OBJECT_ID ( 'dbo.ufnGetEmployees', 'F' ) IS NOT NULL   
+IF EXISTS (SELECT *
+               FROM   sys.objects
+               WHERE  object_id = OBJECT_ID(N'dbo.ufnGetEmployees')
+                      AND type IN ( N'FN', N'IF', N'TF', N'FS', N'FT' ))   
     DROP FUNCTION dbo.ufnGetEmployees;  
 GO 
 --Zwraca wszystkich pracowników na danej pozycji
@@ -838,7 +858,10 @@ BEGIN
 END
 GO
 
-IF OBJECT_ID('dbo.ufnGetActiveClients', 'FN') IS NOT NULL
+IF EXISTS (SELECT *
+               FROM   sys.objects
+               WHERE  object_id = OBJECT_ID(N'dbo.ufnGetActiveClients')
+                      AND type IN ( N'FN', N'IF', N'TF', N'FS', N'FT' ))  
     DROP FUNCTION dbo.ufnGetActiveClients
 GO
 -- Zwraca klientów, którzy dokonali zakupów w danym przedziale czasowym
@@ -857,10 +880,13 @@ BEGIN
 END
 GO
 
-IF OBJECT_ID('dbo.ufnCountItemsInWarehouse', 'FN') IS NOT NULL
+IF EXISTS (SELECT *
+               FROM   sys.objects
+               WHERE  object_id = OBJECT_ID(N'dbo.ufnCountItemsInWarehouse')
+                      AND type IN ( N'FN', N'IF', N'TF', N'FS', N'FT' ))  
     DROP FUNCTION dbo.ufnCountItemsInWarehouse
 GO
--- Zwaraca iloæ danego przedmiotu w magazynach (z danego kraju)
+-- Zwaraca ilość danego przedmiotu w magazynach (z danego kraju)
 CREATE FUNCTION dbo.ufnCountItemsInWarehouse (@id INT, @country	NVARCHAR(30) = NULL)
 RETURNS INT
 AS
@@ -873,10 +899,13 @@ BEGIN
 END
 GO
 
-IF OBJECT_ID('dbo.ufnGetLogs', 'FN') IS NOT NULL
+IF EXISTS (SELECT *
+               FROM   sys.objects
+               WHERE  object_id = OBJECT_ID(N'dbo.ufnGetLogs')
+                      AND type IN ( N'FN', N'IF', N'TF', N'FS', N'FT' ))  
     DROP FUNCTION dbo.ufnGetLogs
 GO
--- Fukncja zwracaj¹ca logi z danego dnia
+-- Fukncja zwracająca logi z danego dnia
 CREATE FUNCTION ufnGetLogs(@date DATETIME)
 RETURNS @outputTable TABLE (Info TEXT, Level CHAR(1))
 AS
@@ -886,10 +915,13 @@ BEGIN
 END 
 GO
 
-IF OBJECT_ID('dbo.ufnUsedPromotionCodes', 'FN') IS NOT NULL
+IF EXISTS (SELECT *
+               FROM   sys.objects
+               WHERE  object_id = OBJECT_ID(N'dbo.ufnUsedPromotionCodes')
+                      AND type IN ( N'FN', N'IF', N'TF', N'FS', N'FT' ))  
     DROP FUNCTION dbo.ufnUsedPromotionCodes
 GO
--- Zwraca kody u¿yte przez u¿ytkowinika z danym loginem
+-- Zwraca kody użyte przez użytkowinika z danym loginem
 CREATE FUNCTION ufnUsedPromotionCodes(@Login NVARCHAR(30))
 RETURNS @outputTable TABLE (CodeID INT, Code NVARCHAR(10), ProductID INT, Discount INT, OrderID INT)
 AS
@@ -906,7 +938,7 @@ GO
 IF OBJECT_ID ( 'Top5Commentators', 'v' ) IS NOT NULL   
     DROP VIEW Top5Commentators;  
 GO
--- Najlepsi komentuj¹ce
+-- Najlepsi komentujące
 CREATE VIEW Top5Commentators
 AS
 	SELECT TOP 5 ClientsLogin, COUNT(ClientsLogin) "Count" FROM dbo.Comments
@@ -927,7 +959,7 @@ GO
 IF OBJECT_ID ( 'ItemsToSend', 'v' ) IS NOT NULL   
     DROP VIEW ItemsToSend;  
 GO
--- Przedmioty, które nale¿y wys³aæ
+-- Przedmioty, które należy wysłać
 CREATE VIEW ItemsToSend
 AS
 	SELECT O.Id, O.Country, O.City, O.Address, OD.ProductsId, OD.Quantity FROM Status AS S JOIN OrdersStatus AS OS
@@ -940,7 +972,7 @@ GO
 IF OBJECT_ID ( 'TopBuyers', 'v' ) IS NOT NULL   
     DROP VIEW TopBuyers;  
 GO
--- Najlepsi kupuj¹cy
+-- Najlepsi kupujący
 CREATE VIEW TopBuyers
 AS
 	SELECT TOP 5 O.ClientsLogin, SUM(ROUND(OD.UnitPrice * OD.Quantity * CAST((1 - OD.Discount) AS MONEY), 2)) AS TotalSpend
@@ -965,7 +997,7 @@ GO
 IF OBJECT_ID ( 'ActiveClients', 'v' ) IS NOT NULL   
     DROP VIEW ActiveClients;  
 GO
--- Klienci z aktywnymi us³ugami 
+-- Klienci z aktywnymi usługami 
 CREATE VIEW ActiveClients
 AS
 	SELECT P.Id AS [ClientId], A.ServicesId AS [ServiceID], P.Name, P.Surname, A.StartDate, A.EndDate 
@@ -993,7 +1025,7 @@ GO
 IF OBJECT_ID('dbo.uspAddItem', 'P') IS NOT NULL
     DROP PROCEDURE dbo.uspAddItem
 GO
---Dodawanie przedmiotów do bazy. Nale¿y tego u¿ywaæ zamiast zwyk³ych insertów
+--Dodawanie przedmiotów do bazy. Należy tego używać zamiast zwykłych insertów
 CREATE PROCEDURE dbo.uspAddItem (@name NVARCHAR(30), @description TEXT, @category NVARCHAR(30))
 AS 
 	BEGIN TRY 
@@ -1028,7 +1060,7 @@ GO
 IF OBJECT_ID('dbo.uspAddService', 'P') IS NOT NULL
     DROP PROCEDURE dbo.uspAddService
 GO
---Dodawanie us³ug do bazy. Nale¿y tego u¿ywaæ zamiast zwyk³ych insertów
+--Dodawanie usług do bazy. Należy tego u¿ywaæ zamiast zwykłych insertów
 CREATE PROCEDURE dbo.uspAddService (@name NVARCHAR(30), @time INT, @description TEXT, @category NVARCHAR(30))
 AS 
 	BEGIN TRY 
@@ -1151,7 +1183,7 @@ GO
 IF OBJECT_ID('dbo.uspAddClients', 'P') IS NOT NULL
     DROP PROCEDURE dbo.uspAddClients
 GO
---Rejestracja nowych u¿ytkowników
+--Rejestracja nowych użytkowników
 CREATE PROCEDURE dbo.uspAddClients (@login NVARCHAR(30), @password NVARCHAR(30) ,@name NVARCHAR(30), @surname NVARCHAR(30), @email NVARCHAR(30),
 								   @phone NVARCHAR(12) = NULL, @country NVARCHAR(30) = NULL, @city NVARCHAR(30) = NULL, @adress NVARCHAR(30) = NULL)
 AS 
@@ -1221,35 +1253,68 @@ GO
 IF OBJECT_ID ('LogPayments', 'TR') IS NOT NULL
    DROP TRIGGER LogPayments;
 GO
--- Dodawanie logów przy p³atnoci
+-- Dodawanie logów przy płatnoci
 CREATE TRIGGER LogPayments ON dbo.Payments
 AFTER INSERT 
 AS 
 	INSERT INTO dbo.Logs(Info, Level)
-	SELECT N'Zamówienie nr ' +  CONVERT(VARCHAR(20),OrdersId) + N' zosta³o p³acone', 'I' FROM inserted
+	SELECT N'Zamówienie nr ' +  CONVERT(VARCHAR(20),OrdersId) + N' zostało opłacone', 'I' FROM inserted
 GO
 
 IF OBJECT_ID ('MoveToExpiredServices', 'TR') IS NOT NULL
    DROP TRIGGER MoveToExpiredServices;
 GO
--- Automatyczna archiwizacja us³ug
+-- Automatyczna archiwizacja usług
 CREATE TRIGGER MoveToExpiredServices ON dbo.ActiveServices
 AFTER DELETE 
 AS 
 	INSERT INTO dbo.ExpiredServices SELECT * FROM deleted
 GO
+
+IF OBJECT_ID ('AddNewsAfterSales', 'TR') IS NOT NULL
+   DROP TRIGGER AddNewsAfterSales;
+GO
+-- Automatyczna dodawanie newsa o promocji
+CREATE TRIGGER AddNewsAfterSales ON dbo.Sales
+AFTER INSERT 
+AS 
+	INSERT INTO dbo.News(Topic, NewsBody, Date) VALUES (N'Nowa promocja', N'Sprawdź nowe lepsze ceny', GETDATE())
+GO
+
+IF OBJECT_ID ('LogEndSales', 'TR') IS NOT NULL
+   DROP TRIGGER LogEndSales;
+GO
+-- Automatyczna logowanie zakończenia promocji
+CREATE TRIGGER LogEndSales ON dbo.Sales
+AFTER DELETE 
+AS 	
+	INSERT INTO dbo.Logs(Info, Level)
+	SELECT N'Promocja na ' +  ufnGetProductName(ProductsId) + N' zostało zakończona', 'I' FROM deleted
+GO
 ------------------------------------------------------- KONIEC TRIGGERÓW
 
 ------------------------------------------------------- SQL JOB
+-- Usuwanie wygasłych usług
+-- Usuwanie nieaktywnych przecen
 DECLARE @database NVARCHAR(128) = (SELECT DB_NAME())
 USE msdb
 EXEC dbo.sp_add_job  
     @job_name = N'AutoDeleteExpiredServices'  
+EXEC dbo.sp_add_job  
+    @job_name = N'AutoDeleteSales' 
 EXEC sp_add_jobstep  
     @job_name = N'AutoDeleteExpiredServices',  
     @step_name = N'AutoDeleteServicesStep',  
     @subsystem = N'TSQL',  
     @command = N'DELETE FROM ActiveServices WHERE EndDate > StartDate',   
+    @retry_attempts = 1,  
+    @retry_interval = 1,
+	@database_name=@database 
+EXEC sp_add_jobstep  
+    @job_name = N'AutoDeleteSales',  
+    @step_name = N'AutoDeleteSalesStep',  
+    @subsystem = N'TSQL',  
+    @command = N'DELETE FROM Sales WHERE Until < GETDATE()',   
     @retry_attempts = 1,  
     @retry_interval = 1,
 	@database_name=@database 
@@ -1261,6 +1326,11 @@ EXEC dbo.sp_add_schedule
 EXEC sp_attach_schedule  
    @job_name = N'AutoDeleteExpiredServices',  
    @schedule_name = N'RunPerDay'  
+EXEC sp_attach_schedule  
+   @job_name = N'AutoDeleteSales',  
+   @schedule_name = N'RunPerDay'  
 EXEC dbo.sp_add_jobserver  
     @job_name = N'AutoDeleteExpiredServices'
+EXEC dbo.sp_add_jobserver  
+    @job_name = N'AutoDeleteSales'
 ------------------------------------------------------- KONIEC SQL JOB
