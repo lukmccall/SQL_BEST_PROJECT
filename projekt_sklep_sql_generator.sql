@@ -1289,8 +1289,9 @@ CREATE TRIGGER LogEndSales ON dbo.Sales
 AFTER DELETE 
 AS 	
 	INSERT INTO dbo.Logs(Info, Level)
-	SELECT N'Promocja na ' +  ufnGetProductName(ProductsId) + N' zostało zakończona', 'I' FROM deleted
+	SELECT N'Promocja na ' +  dbo.ufnGetProductName(ProductsId) + N' zostało zakończona', 'I' FROM deleted
 GO
+
 ------------------------------------------------------- KONIEC TRIGGERÓW
 
 ------------------------------------------------------- SQL JOB
