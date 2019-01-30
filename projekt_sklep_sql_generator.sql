@@ -612,13 +612,9 @@ GO
 ALTER TABLE ItemsInWarehouse ADD CHECK (Quantity >= 0)  
 ALTER TABLE ActiveServices ADD CHECK (StartDate <= EndDate)  
 ALTER TABLE BonusSalary ADD CHECK (BonusSalary > 0)  
---ALTER TABLE Comments ADD CHECK (DATALENGTH(CommentBody) > 0)
 ALTER TABLE ExpiredServices ADD CHECK (StartDate <= EndDate)  
---ALTER TABLE Logs ADD CHECK (DATALENGTH(Info) > 0)
---ALTER TABLE News ADD CHECK (DATALENGTH(NewsBody) > 0)
---Constraints of type CHECK cannot be created on columns of type text. :( 
 ALTER TABLE OrdersDetails ADD CHECK (Discount >= 0 AND Discount <= 100)
---ALTER TABLE Payments ADD CHECK (Payments > 0) -- tego nie wiem jak poprawić xD
+ALTER TABLE Payments ADD CHECK (Value > 0)
 ALTER TABLE Positions ADD CHECK (Salary > 0)
 ALTER TABLE ProductsPrices ADD CHECK (StartDate <= EndDate OR EndDate IS NULL)
 ALTER TABLE PromotionCodes ADD CHECK (Discount > 0 AND Discount <= 100)
