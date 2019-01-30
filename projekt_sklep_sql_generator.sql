@@ -659,6 +659,9 @@ EXEC sp_addmessage 50006, 16,
 	N'This position does not exist';  
 GO  
 
+EXEC sp_addmessage 50007, 16,   
+	N'Product price not found';  
+GO  
 
 IF OBJECT_ID ( 'dbo.uspDisplayErrors', 'P' ) IS NOT NULL   
     DROP PROCEDURE dbo.uspDisplayErrors;  
@@ -931,6 +934,27 @@ BEGIN
 	RETURN
 END
 GO
+
+IF EXISTS (SELECT *
+               FROM   sys.objects
+               WHERE  object_id = OBJECT_ID(N'dbo.ufnGetPrice')
+                      AND type IN ( N'FN', N'IF', N'TF', N'FS', N'FT' ))  
+    DROP FUNCTION dbo.ufnGetPrice
+GO
+-- zwraca aktualną(lub w danym dniu) cene przedmiotu
+CREATE FUNCTION ufnGetPrice(@id INT,@date DATETIME = NULL) 
+RETURNS MONEY
+AS 
+BEGIN
+	IF @date IS NULL AND EXISTS (SELECT Until FROM dbo.Sales WHERE ProductsId = @id AND Until <= GETDATE())
+		RETURN(SELECT UnitPrice FROM dbo.Sales WHERE ProductsId = @id AND Until <= GETDATE()) 
+	IF @date IS NULL 
+		RETURN(SELECT UnitPrice FROM dbo.ProductsPrices WHERE ProductsId = @id AND EndDate IS NULL)
+	RETURN(SELECT UnitPrice FROM dbo.ProductsPrices 
+			WHERE (@date BETWEEN StartDate AND EndDate AND EndDate IS NOT NULL) 
+			OR (@date >= StartDate AND EndDate IS NULL))
+END
+GO
 ------------------------------------------------------- KONIEC FUNKCJI
 
 ------------------------------------------------------- WIDOKI 
@@ -1127,8 +1151,6 @@ AS
 			IF @SumQuantity < @quantity OR @SumQuantity IS NULL
 				RAISERROR(50002,-1,-1)
 		
-	
-
 			DECLARE @IdWar INT
 			DECLARE K_WareHouse CURSOR 
 			FOR SELECT Id FROM Warehouse FOR READ ONLY
@@ -1270,6 +1292,15 @@ AS
 	END CATCH
 GO
 
+IF OBJECT_ID('dbo.uspInitOrder', 'P') IS NOT NULL
+    DROP PROCEDURE dbo.uspInitOrder
+GO
+-- Tworzenie nowego zamówienia 
+CREATE PROCEDURE uspInitOrder(@person INT, @Cauntry NVarchar(30), @Address NVarchar(30),@City NVarchar(30))
+AS
+	INSERT INTO Orders VALUES(GETDATE(),@City,@Cauntry,@Address,(SELECT Login FROM Clients WHERE @person = PeopleId));
+GO
+
 ------------------------------------------------------- KONIEC PROCEDUR
 ------------------------------------------------------- TRIGGERY
 IF OBJECT_ID ('LogPayments', 'TR') IS NOT NULL
@@ -1314,6 +1345,67 @@ AS
 	SELECT N'Promocja na ' +  dbo.ufnGetProductName(ProductsId) + N' zostało zakończona', 'I' FROM deleted
 GO
 
+IF OBJECT_ID ('OrderDetailsGetPrice', 'TR') IS NOT NULL
+   DROP TRIGGER OrderDetailsGetPrice;
+GO
+-- Uzupełnianie cen produktów 
+CREATE TRIGGER OrderDetailsGetPrice ON OrdersDetails
+INSTEAD OF INSERT
+AS
+BEGIN TRY
+	DECLARE @ProductId INT
+	DECLARE @OrderId INT
+	DECLARE @Discount INT
+	DECLARE @Quantity INT
+
+	DECLARE K_NextInser CURSOR 
+	FOR SELECT OrdersId, ProductsId, Discount, Quantity FROM inserted 
+	FOR READ ONLY
+		
+	Open K_NextInser 
+	FETCH K_NextInser INTO @OrderId, @ProductId, @Discount, @Quantity
+			
+	WHILE (@@FETCH_STATUS<>-1)
+	BEGIN
+		DECLARE @Login nVARCHAR(30) = (SELECT ClientsLogin FROM Orders WHERE Id = @OrderId)
+
+		DECLARE @result int;  
+		EXECUTE @result = dbo.uspSellItem @ProductId, NULL, @Quantity;  
+
+
+		IF (@result = 1 AND @result IS NOT NULL)
+		BEGIN 
+			DECLARE @UnitPrice MONEY = dbo.ufnGetPrice(@ProductId, DEFAULT)
+			INSERT INTO OrdersDetails VALUES(@OrderId,@ProductId,@UnitPrice, @Quantity,@Discount)		
+		END
+		ELSE
+			RAISERROR(50007,-1,-1) 
+ 		
+		FETCH K_NextInser INTO @OrderId, @ProductId, @Discount, @Quantity
+	END
+	CLOSE K_NextInser 
+	DEALLOCATE K_NextInser 
+
+END TRY
+BEGIN CATCH
+	EXEC dbo.uspDisplayErrors
+END CATCH
+GO
+
+IF OBJECT_ID ('NewPriceInsert', 'TR') IS NOT NULL
+   DROP TRIGGER NewPriceInsert;
+GO
+-- zapewnia poprawne dodanie nowych cen
+CREATE TRIGGER NewPriceInsert ON ProductsPrices
+INSTEAD OF INSERT 
+AS 
+	DECLARE @Time DATETIME = GETDATE()
+	UPDATE ProductsPrices SET EndDate=@Time
+	FROM inserted I JOIN ProductsPrices PP ON I.ProductsId=PP.ProductsId
+ 	WHERE PP.EndDate IS NULL 
+
+	INSERT INTO ProductsPrices SELECT I.ProductsId, @Time, NULL, I.UnitPrice FROM inserted I 
+GO	
 ------------------------------------------------------- KONIEC TRIGGERÓW
 ------------------------------------------------------- SQL JOB
 -- Usuwanie wygasłych usług
