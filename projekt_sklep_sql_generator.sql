@@ -10,7 +10,7 @@ CREATE TABLE ActiveServices (
 )
 GO
 
-ALTER TABLE ActiveServices ADD constraint ActiveServices_PK PRIMARY KEY CLUSTERED (ServicesId, ClientsLogin, EndDate)
+ALTER TABLE ActiveServices ADD constraint ActiveServices_PK PRIMARY KEY CLUSTERED (lServicesId, ClientsLogin, EndDate)
      WITH (
      ALLOW_PAGE_LOCKS = ON , 
      ALLOW_ROW_LOCKS = ON ) 
@@ -1050,7 +1050,7 @@ AS
 	WITH cte (BossId, EmployeeId)
 	AS 
 	(
-		SELECT B.PeopleId, E.BossId FROM Employees AS B JOIN Employees AS E ON E.BossId = B.PeopleId
+		SELECT B.PeopleId, E.PeopleId FROM Employees AS B JOIN Employees AS E ON E.BossId = B.PeopleId
 		UNION ALL
 		SELECT E.BossId, cte.EmployeeId
 		FROM cte JOIN Employees AS E
