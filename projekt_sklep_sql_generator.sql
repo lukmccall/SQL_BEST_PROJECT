@@ -70,7 +70,7 @@ GO
 CREATE TABLE Comments ( 
 	NewsId INT NOT NULL , 
     ClientsLogin NVARCHAR(30) NOT NULL,
-    AddDate DATETIME DEFAULT GETDATE(),
+    AddDate DATETIME DEFAULT GETDATE() NOT NULL,
 	CommentBody text
 )
 GO
@@ -621,7 +621,7 @@ ALTER TABLE OrdersDetails ADD CHECK (Discount >= 0 AND Discount <= 100)
 ALTER TABLE Positions ADD CHECK (Salary > 0)
 ALTER TABLE ProductsPrices ADD CHECK (StartDate <= EndDate OR EndDate IS NULL)
 ALTER TABLE PromotionCodes ADD CHECK (Discount > 0 AND Discount <= 100)
-ALTER TABLE Ratings ADD CHECK (Rating >= 0 AND Discount <= 10)
+ALTER TABLE Ratings ADD CHECK (Rating >= 0)
 ALTER TABLE Sales ADD CHECK (UnitPrice >= 0)
 ALTER TABLE Services ADD CHECK (Time >= 0)
 ------------------------------------------------------- KONIEC DODATKOWYCH CONSTRAINÓW 
