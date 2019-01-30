@@ -41,3 +41,45 @@ SELECT * FROM OrdersDetails WHERE OrdersId = 1
 SELECT * FROM ItemsInWarehouse
 -- zbieranie produktow z wielu magazynow
 
+
+
+--kolejne przykladziki, @daniel_Bobrowolski, kto pisze komentarze pod tym co robi?
+
+--Prezentacja ze dzialaja procedury 
+EXEC uspAddPeople 1, N'Jan', N'Kowalski', N'jankowalski123@gmailc.com', '123456789', N'Polska', N'Kraków', N'Dolna1234'
+EXEC uspAddPeople 2, N'Adam', N'Bobrow', N'abobrow@gmailc.com', '012840', N'Polska', N'Kraków', N'Gorna1245'
+
+SELECT * FROM People
+
+--Dodawanie pozycji
+INSERT INTO Positions VALUES (N'SuperSzefOgrodnik', 10000)
+INSERT INTO Positions VALUES (N'Podwladny', 1000)
+
+--Dodawanie pracownikow, btw super sposob TSQL ze nie moge zrobic w exec GETDATE()
+DECLARE @tmp DATETIME
+SET @tmp = GETDATE()
+
+EXEC uspAddEmployees N'Jan', N'Ogrodnik', N'jan@ogrodnicy123.pl', N'SuperSzefOgrodnik', '555444333', N'Polska', N'Grabina', N'Ogrodnicza12', @tmp
+EXEC uspAddEmployees N'Bartosz', N'Bartkowski', N'bar@bartosz.pl', N'Podwladny', '12356423', N'Polska', N'Krakow', N'Polna', @tmp, 3
+EXEC uspAddEmployees N'Lidiusz', N'Wartki', N'war@wartki.pl', N'Podwladny', '12356423', N'Polska', N'Krakow', N'Polna', @tmp, 3
+
+SELECT * FROM Employees
+
+--Wypisywanie zaleznosci sluzbowych
+SELECT * FROM LineOfAuthority
+
+--Zmiania dnia zatrudnienia na inny zeby przetestowac funkcje ktora liczy ile zarobili pracownicy
+UPDATE Employees SET HireDate = '2018-05-30' WHERE BossId IS NULL
+UPDATE Employees SET HireDate = '2018-06-12' WHERE PositionsId = 2
+
+SELECT * FROM Employees
+
+SELECT * FROM ufnSalaries('2018-01-01', GETDATE())
+
+--Dodawanie bonusow
+INSERT INTO BonusSalary VALUES (3, GETDATE(), 5000, 'Ogrodnik miesiaca')
+
+SELECT * FROM ufnSalaries('2018-01-01', GETDATE())
+
+
+
