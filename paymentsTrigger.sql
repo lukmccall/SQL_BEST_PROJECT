@@ -1,4 +1,4 @@
-IF OBJECT_ID ('[LogPayments] ', 'TR') IS NOT NULL
+IF OBJECT_ID ('LogPayments', 'TR') IS NOT NULL
    DROP TRIGGER LogPayments;
 GO
 CREATE TRIGGER LogPayments ON dbo.Payments

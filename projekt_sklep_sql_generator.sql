@@ -309,7 +309,7 @@ GO
 CREATE TABLE Positions (
     Id         INT IDENTITY(1,1),
     Position   nvarchar(30) NOT NULL, 
-	Salary	INT NOT NULL ) 
+	Salary	MONEY NOT NULL ) 
 GO
 
 ALTER TABLE Positions ADD constraint Positions_PK PRIMARY KEY CLUSTERED (Id)
@@ -627,6 +627,11 @@ ALTER TABLE Services ADD CHECK (Time >= 0)
 ------------------------------------------------------- KONIEC DODATKOWYCH CONSTRAINÓW 
 
 ------------------------------------------------------- SEKWENCJE
+IF OBJECT_ID('ProductsSequence', 'SO') IS NOT NULL 
+BEGIN
+    DROP SEQUENCE ProductsSequence
+END
+-- Sekwencja, id dla us³ug i przedmiotów 
 CREATE SEQUENCE ProductsSequence 
     START WITH 1  
     INCREMENT BY 1
@@ -640,6 +645,24 @@ GO
 EXEC sp_addmessage 50002, 16,   
 	N'This item is unavailable';  
 GO  
+
+EXEC sp_addmessage 50003, 16,   
+	N'Can not create human with this data';  
+GO  
+
+EXEC sp_addmessage 50004, 16,   
+	N'Can not register this user';  
+GO  
+
+EXEC sp_addmessage 50005, 16,   
+	N'Can not create this employee';  
+GO  
+
+EXEC sp_addmessage 50006, 16,   
+	N'This position does not exist';  
+GO  
+
+
 
 IF OBJECT_ID ( 'dbo.uspDisplayErrors', 'P' ) IS NOT NULL   
     DROP PROCEDURE dbo.uspDisplayErrors;  
@@ -735,7 +758,7 @@ IF OBJECT_ID ( 'dbo.ufnSalaries', 'F' ) IS NOT NULL
 GO 
 --Funkcja zwracaj¹ca ile zarobili procownicy w danym okresie czasu
 CREATE FUNCTION ufnSalaries(@startDate DATETIME, @endDate DATETIME)
-RETURNS @outputTable TABLE(Name NVARCHAR(30), Surname NVARCHAR(30), Earnings INT)
+RETURNS @outputTable TABLE(Name NVARCHAR(30), Surname NVARCHAR(30), Earnings MONEY)
 AS
 BEGIN
 	INSERT INTO @outputTable 
@@ -994,8 +1017,9 @@ AS
 	
 			INSERT INTO dbo.Items VALUES (@id, @name, @catId)
 			INSERT INTO dbo.Products VALUES (@id, @description)
-
-			COMMIT TRAN uspAddItem
+			
+			IF @tranCount = 0
+				COMMIT TRAN uspAddItem
 	END TRY
 	BEGIN CATCH 
 		ROLLBACK TRAN uspAddItem
@@ -1031,7 +1055,8 @@ AS
 				INSERT INTO dbo.Services(Id, Name, Time, CategoriesID) VALUES (@id, @name, @time, @catId)
 				INSERT INTO dbo.Products VALUES (@id, @description)
 
-			COMMIT TRAN uspAddServicesTran
+				IF @tranCount = 0
+					COMMIT TRAN uspAddServicesTran
 	END TRY
 	BEGIN CATCH 
 		ROLLBACK TRAN uspAddServicesTran
@@ -1092,13 +1117,108 @@ AS
 				WHERE ItemsId = @id AND WarehouseId = @warehouse
 
 		END
-	
-		
+
 	END TRY
 	BEGIN CATCH
 		EXEC dbo.uspDisplayErrors
 	END CATCH
 GO
+
+IF OBJECT_ID('dbo.uspAddPeople', 'P') IS NOT NULL
+    DROP PROCEDURE dbo.uspAddPeople
+GO
+--Tworzenie ludzi, procedura pomocnicza
+CREATE PROCEDURE dbo.uspAddPeople (@id INT OUTPUT, @name NVARCHAR(30), @surname NVARCHAR(30), @email NVARCHAR(30),
+								   @phone NVARCHAR(12), @country NVARCHAR(30), @city NVARCHAR(30), @adress NVARCHAR(30))
+AS 
+	BEGIN TRY 
+		DECLARE @tranCount INT = @@TRANCOUNT			
+		IF @tranCount = 0
+			BEGIN TRAN uspAddPeople
+		ELSE
+			SAVE TRAN uspAddPeople
+
+			INSERT INTO People(Name,Surname,Email,Phone,Country,City,Adress)
+			VALUES (@name,@surname,@email,@phone,@country,@city,@adress)
+			SET @id = SCOPE_IDENTITY()
+
+			IF @tranCount = 0 
+				COMMIT TRAN uspAddPeople
+	END TRY
+	BEGIN CATCH 
+		ROLLBACK TRAN uspAddPeople
+		RAISERROR(50003,-1,-1)
+	END CATCH
+GO
+
+IF OBJECT_ID('dbo.uspAddClients', 'P') IS NOT NULL
+    DROP PROCEDURE dbo.uspAddClients
+GO
+--Rejestracja nowych u¿ytkowników
+CREATE PROCEDURE dbo.uspAddClients (@login NVARCHAR(30), @password NVARCHAR(30) ,@name NVARCHAR(30), @surname NVARCHAR(30), @email NVARCHAR(30),
+								   @phone NVARCHAR(12) = NULL, @country NVARCHAR(30) = NULL, @city NVARCHAR(30) = NULL, @adress NVARCHAR(30) = NULL)
+AS 
+	BEGIN TRY 
+		DECLARE @tranCount INT = @@TRANCOUNT
+		DECLARE @id INT
+			
+		IF @tranCount = 0
+			BEGIN TRAN uspAddClients
+		ELSE
+			SAVE TRAN uspAddClients
+
+			EXEC dbo.uspAddPeople @id OUTPUT, @name, @surname, @email, @phone, @country, @city, @adress
+			INSERT INTO Clients(Login, PeopleId, Password) VALUES(@login, @id, @password)
+
+			IF @tranCount = 0 
+				COMMIT TRAN uspAddClients
+	END TRY
+	BEGIN CATCH
+		RAISERROR(50004,-1,-1)
+		ROLLBACK
+	END CATCH
+GO
+
+IF OBJECT_ID('dbo.uspAddEmployees', 'P') IS NOT NULL
+    DROP PROCEDURE dbo.uspAddEmployees
+GO
+--Zatrudnianie nowego pracownika
+CREATE PROCEDURE dbo.uspAddEmployees (@name NVARCHAR(30), @surname NVARCHAR(30), @email NVARCHAR(30),  @position NVARCHAR(30),
+								   @phone NVARCHAR(12) = NULL, @country NVARCHAR(30) = NULL, @city NVARCHAR(30) = NULL, @adress NVARCHAR(30) = NULL,
+								   @hireDate DATE = NULL, @BossId INT = NULL)
+AS 
+	BEGIN TRY 
+		DECLARE @tranCount INT = @@TRANCOUNT
+		DECLARE @id INT
+		DECLARE @positionId INT
+
+		IF @tranCount = 0
+			BEGIN TRAN uspAddEmployees
+		ELSE
+			SAVE TRAN uspAddEmployees
+
+			IF NOT EXISTS (SELECT Id FROM Positions WHERE Position LIKE @position)
+				RAISERROR(50006,-1,-1)
+			IF @hireDate IS NULL 
+				SET @hireDate = GETDATE()
+
+			SET @positionId = (SELECT TOP 1 Id FROM Positions WHERE Position LIKE @position)
+			EXEC dbo.uspAddPeople @id OUTPUT, @name, @surname, @email, @phone, @country, @city, @adress
+			INSERT INTO Employees(PeopleId, HireDate, PositionsId, BossId) 
+			VALUES(@id,@hireDate, @positionId, @BossId)
+
+			IF @tranCount = 0 
+				COMMIT TRAN uspAddEmployees
+	END TRY
+	BEGIN CATCH
+		ROLLBACK TRAN uspAddEmployees
+		IF ERROR_NUMBER () = 50006
+			RAISERROR(50006,-1,-1)
+		ELSE
+			RAISERROR(50005,-1,-1)
+	END CATCH
+GO
+
 ------------------------------------------------------- KONIEC PROCEDUR
 ------------------------------------------------------- TRIGGERY
 IF OBJECT_ID ('LogPayments', 'TR') IS NOT NULL
@@ -1111,4 +1231,39 @@ AS
 	INSERT INTO dbo.Logs(Info, Level)
 	SELECT N'Zamówienie nr ' +  CONVERT(VARCHAR(20),OrdersId) + N' zosta³o p³acone', 'I' FROM inserted
 GO
+
+IF OBJECT_ID ('MoveToExpiredServices', 'TR') IS NOT NULL
+   DROP TRIGGER MoveToExpiredServices;
+GO
+-- Automatyczna archiwizacja us³ug
+CREATE TRIGGER MoveToExpiredServices ON dbo.ActiveServices
+AFTER DELETE 
+AS 
+	INSERT INTO dbo.ExpiredServices SELECT * FROM deleted
+GO
 ------------------------------------------------------- KONIEC TRIGGERÓW
+
+------------------------------------------------------- SQL JOB
+DECLARE @database NVARCHAR(128) = (SELECT DB_NAME())
+USE msdb
+EXEC dbo.sp_add_job  
+    @job_name = N'AutoDeleteExpiredServices'  
+EXEC sp_add_jobstep  
+    @job_name = N'AutoDeleteExpiredServices',  
+    @step_name = N'AutoDeleteServicesStep',  
+    @subsystem = N'TSQL',  
+    @command = N'DELETE FROM ActiveServices WHERE EndDate > StartDate',   
+    @retry_attempts = 1,  
+    @retry_interval = 1,
+	@database_name=@database 
+EXEC dbo.sp_add_schedule  
+    @schedule_name = N'RunPerDay',  
+    @freq_type = 4,  
+	@freq_interval = 1,
+    @active_start_time = 000000; 
+EXEC sp_attach_schedule  
+   @job_name = N'AutoDeleteExpiredServices',  
+   @schedule_name = N'RunPerDay'  
+EXEC dbo.sp_add_jobserver  
+    @job_name = N'AutoDeleteExpiredServices'
+------------------------------------------------------- KONIEC SQL JOB
