@@ -1364,23 +1364,31 @@ BEGIN TRY
 		
 	Open K_NextInser 
 	FETCH K_NextInser INTO @OrderId, @ProductId, @Discount, @Quantity
-			
 	WHILE (@@FETCH_STATUS<>-1)
 	BEGIN
-		DECLARE @Login nVARCHAR(30) = (SELECT ClientsLogin FROM Orders WHERE Id = @OrderId)
+		--DECLARE @Login nVARCHAR(30) = (SELECT ClientsLogin FROM Orders WHERE Id = @OrderId)
+		DECLARE @UnitPrice MONEY
+	
+		IF @Quantity <> 0
+		BEGIN
+		
+			DECLARE @result int;  
+			EXECUTE @result = dbo.uspSellItem @ProductId, NULL, @Quantity;  
 
-		DECLARE @result int;  
-		EXECUTE @result = dbo.uspSellItem @ProductId, NULL, @Quantity;  
 
-
-		IF (@result = 1 AND @result IS NOT NULL)
-		BEGIN 
-			DECLARE @UnitPrice MONEY = dbo.ufnGetPrice(@ProductId, DEFAULT)
-			INSERT INTO OrdersDetails VALUES(@OrderId,@ProductId,@UnitPrice, @Quantity,@Discount)		
-		END
+			IF (@result = 1 AND @result IS NOT NULL)
+			BEGIN 
+				SET @UnitPrice = dbo.ufnGetPrice(@ProductId, DEFAULT)
+				INSERT INTO OrdersDetails VALUES(@OrderId,@ProductId,@UnitPrice, @Quantity,@Discount)		
+			END
+			ELSE
+				RAISERROR(50007,-1,-1) 
+ 		END
 		ELSE
-			RAISERROR(50007,-1,-1) 
- 		
+		BEGIN
+			SET @UnitPrice = dbo.ufnGetPrice(@ProductId, DEFAULT)
+			INSERT INTO OrdersDetails VALUES(@OrderId,@ProductId,@UnitPrice, @Quantity,@Discount)
+		END
 		FETCH K_NextInser INTO @OrderId, @ProductId, @Discount, @Quantity
 	END
 	CLOSE K_NextInser 
@@ -1391,7 +1399,7 @@ BEGIN CATCH
 	EXEC dbo.uspDisplayErrors
 END CATCH
 GO
-
+							    
 IF OBJECT_ID ('NewPriceInsert', 'TR') IS NOT NULL
    DROP TRIGGER NewPriceInsert;
 GO
