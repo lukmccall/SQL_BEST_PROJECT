@@ -1017,6 +1017,23 @@ AS
 	FROM ItemsInWarehouse AS IW JOIN Warehouse AS W ON IW.WarehouseId = W.Id
 	GROUP BY IW.ItemsId
 GO
+
+IF OBJECT_ID('LineOfAuthority','v') IS NOT NULL
+	DROP VIEW LineOfAuthority
+GO
+CREATE VIEW LineOfAuthority
+AS
+	WITH cte (BossId, EmployeeId)
+	AS 
+	(
+		SELECT B.PeopleId, E.BossId FROM Employees AS B JOIN Employees AS E ON E.BossId = B.PeopleId
+		UNION ALL
+		SELECT E.BossId, cte.EmployeeId
+		FROM cte JOIN Employees AS E
+        ON cte.EmployeeId = E.BossId
+	)
+	SELECT * FROM cte
+GO
 ------------------------------------------------------- KONIEC WIDOKÓW
 
 
@@ -1293,7 +1310,6 @@ AS
 GO
 
 ------------------------------------------------------- KONIEC TRIGGERÓW
-
 ------------------------------------------------------- SQL JOB
 -- Usuwanie wygasłych usług
 -- Usuwanie nieaktywnych przecen
