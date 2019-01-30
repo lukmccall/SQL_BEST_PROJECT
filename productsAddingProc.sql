@@ -70,18 +70,24 @@ AS
 	END CATCH
 GO
 	
+IF OBJECT_ID('dbo.uspSellItem', 'P') IS NOT NULL
+    DROP PROCEDURE dbo.uspSellItem
+GO
+--Sprzedwanie przedmiotu
 CREATE PROCEDURE dbo.uspSellItem (@id INT, @warehouse INT = NULL, @quantity INT = 1)
 AS
-	BEGIN TRY
-
-		
+	BEGIN TRY	
+		PRINT @warehouse
+	
 		IF @warehouse IS NULL
 		BEGIN
 			
 			DECLARE @SumQuantity INT = dbo.ufnCountItemsInWarehouse(@id,NULL);
-
-			IF @SumQuantity < @quantity 
-				RAISERROR(50002,-1,-1) --Ukesz popraw bo ja nie wiem co to za error ;-;
+		
+			IF @SumQuantity < @quantity OR @SumQuantity IS NULL
+				RAISERROR(50002,-1,-1)
+		
+	
 
 			DECLARE @IdWar INT
 			DECLARE K_WareHouse CURSOR 
@@ -121,13 +127,11 @@ AS
 				WHERE ItemsId = @id AND WarehouseId = @warehouse
 
 		END
-
 		RETURN 1
-		
 	END TRY
 	BEGIN CATCH
 		EXEC dbo.uspDisplayErrors
 		RETURN -1
 	END CATCH
 GO
-													 
+												 
