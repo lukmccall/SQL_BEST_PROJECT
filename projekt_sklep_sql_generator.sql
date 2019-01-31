@@ -1,3 +1,23 @@
+/*
+	Projekt bazy danych dotyczącej sklepu internetowego
+	Wykonali:
+	- Daniel Dobrowolski
+	- Tomasz Janik
+	- Łukasz Kosmaty
+
+	Spis
+	- Tabele 21
+	- Klucze obce 467 
+	- Constrainy 631 
+	- Sekwencje 646
+	- Błędy 657
+	- Funckje 709
+	- Widoki 980
+	- Procedury 1084
+	- Triggery 1325
+	- Sql jobs 1438
+
+*/
 ------------------------------------------------------- TWORZENIE TABEL
 IF OBJECT_ID('dbo.ActiveServices', 'U') IS NOT NULL 
 	DROP TABLE ActiveServices
@@ -634,7 +654,7 @@ CREATE SEQUENCE ProductsSequence
     INCREMENT BY 1
 GO
 ------------------------------------------------------- KONIEC SEKWENCJI
-------------------------------------------------------- INFORMACJE O B£ÊDACH
+------------------------------------------------------- INFORMACJE O BŁĘDACH
 EXEC sp_addmessage 50001, 16,   
 	N'This category does not exists';  
 GO  

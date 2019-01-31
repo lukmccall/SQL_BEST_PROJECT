@@ -77,7 +77,7 @@ SELECT * FROM Employees
 SELECT * FROM ufnSalaries('2018-01-01', GETDATE())
 
 --Dodawanie bonusow
-INSERT INTO BonusSalary VALUES (3, GETDATE(), 5000, 'Ogrodnik miesiaca')
+INSERT INTO BonusSalary VALUES (4, GETDATE(), 5000, 'Ogrodnik miesiaca')
 
 SELECT * FROM ufnSalaries('2018-01-01', GETDATE())
 
