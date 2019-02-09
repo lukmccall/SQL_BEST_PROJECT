@@ -1,3 +1,4 @@
+USE Sklep
 INSERT INTO Categories VALUES('Marchewki')
 EXEC uspAddItem 'grabki', 'grabimy', 'Marchewki'
 EXEC uspAddService 'Podlewanie Ogrodka', 10000, 'bedziemy podlewac ogrodek za Ciebie', 'Marchewki'
@@ -23,7 +24,7 @@ SELECT * FROM ProductsPrices
 SELECT dbo.ufnGetPrice(1,DEFAULT) 
 Insert into Sales VALUES (1,10,GETDATE()+1000)
 WAITFOR DELAY '000:00:01'
-SELECT dbo.ufnGetPrice(1,DEFAULT) 
+SELECT dbo.ufnGetPrice(1,DEFAULT)
 --pobieranie ceny z uwzglednieniem wyprzedazy
 
 SELECT * FROM News
@@ -42,9 +43,6 @@ SELECT * FROM ItemsInWarehouse
 -- zbieranie produktow z wielu magazynow
 
 
-
---kolejne przykladziki, @daniel_Bobrowolski, kto pisze komentarze pod tym co robi?
-
 --Prezentacja ze dzialaja procedury 
 EXEC uspAddPeople 1, N'Jan', N'Kowalski', N'jankowalski123@gmailc.com', '123456789', N'Polska', N'Kraków', N'Dolna1234'
 EXEC uspAddPeople 2, N'Adam', N'Bobrow', N'abobrow@gmailc.com', '012840', N'Polska', N'Kraków', N'Gorna1245'
@@ -60,8 +58,8 @@ DECLARE @tmp DATETIME
 SET @tmp = GETDATE()
 
 EXEC uspAddEmployees N'Jan', N'Ogrodnik', N'jan@ogrodnicy123.pl', N'SuperSzefOgrodnik', '555444333', N'Polska', N'Grabina', N'Ogrodnicza12', @tmp
-EXEC uspAddEmployees N'Bartosz', N'Bartkowski', N'bar@bartosz.pl', N'Podwladny', '12356423', N'Polska', N'Krakow', N'Polna', @tmp, 3
-EXEC uspAddEmployees N'Lidiusz', N'Wartki', N'war@wartki.pl', N'Podwladny', '12356423', N'Polska', N'Krakow', N'Polna', @tmp, 3
+EXEC uspAddEmployees N'Bartosz', N'Bartkowski', N'bar@bartosz.pl', N'Podwladny', '12356423', N'Polska', N'Krakow', N'Polna', @tmp, 4
+EXEC uspAddEmployees N'Lidiusz', N'Wartki', N'war@wartki.pl', N'Podwladny', '12356423', N'Polska', N'Krakow', N'Polna', @tmp, 4
 
 SELECT * FROM Employees
 
